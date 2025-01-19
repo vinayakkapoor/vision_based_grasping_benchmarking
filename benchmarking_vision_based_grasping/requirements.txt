@@ -1,99 +1,37 @@
-cv-bridge==1.16.2
-dynamic-reconfigure==1.7.3
+catkin-pkg
 empy==3.3.4
-gazebo-plugins==2.9.2
-gazebo-ros==2.9.2
-gencpp==0.7.0
-geneus==3.0.0
-genlisp==0.4.18
-genmsg==0.6.0
-gennodejs==2.0.2
-genpy==0.6.15
-h5py==3.11.0
-importlib-metadata==8.4.0
-joint-state-publisher==1.15.1
-lxml==4.5.0
-# lz4==3.0.2+dfsg
+h5py
+importlib-metadata
+lxml
 lz4
-moveit-commander==1.1.14
-moveit-core==1.1.14
-moveit-ros-planning-interface==1.1.14
-moveit-ros-visualization==1.1.14
-numpy==1.24.3
-opencv-python==4.10.0.84
-opt-einsum==3.3.0
-osrf-pycommon==2.0.2
-Pillow==7.0.0
-protobuf==3.19.6
-psutil==5.5.1
-py-ubjson==0.14.0
-pyasn1==0.4.2
-pyasn1-modules==0.2.1
-pyassimp==4.1.4
-pycairo==1.16.2
-pycryptodomex==3.6.1
-pycups==1.9.73
-pydot==1.4.1
-Pygments==2.3.1
-PyGObject==3.36.0
-PyHamcrest==1.9.0
-PyJWT==1.7.1
-pymacaroons==0.13.0
-PyNaCl==1.3.0
-PyOpenGL==3.1.0
-pyOpenSSL==19.0.0
-pyparsing==2.4.6
-pypng==0.0.20
-PyQRCode==1.2.1
-PyQt5==5.14.1
-# pyRFC3339==1.1
-# pyRFC3339
-# python-apt==2.0.1+ubuntu0.20.4.1
-# python-apt
-python-dateutil==2.7.3
-PyYAML==5.3.1
-qt-dotgraph==0.4.2
-qt-gui==0.4.2
-qt-gui-py-common==0.4.2
-reportlab==3.5.34
-rosapi==0.11.17
-rosbag==1.16.0
-rosboost-cfg==1.15.8
-rosbridge-library==0.11.17
-rosbridge-server==0.11.17
-rosclean==1.15.8
-# rosdep-modules==0.25.1
-rosdep
-# rosdistro==0.9.1
-rosdistro
-# rosdistro-modules
-# rosdistro-modules==0.9.1
-rosgraph==1.16.0
-roslaunch==1.16.0
-roslib==1.15.8
-roslint==0.12.0
-roslz4==1.16.0
-rosmake==1.15.8
-rosmaster==1.16.0
-rosmsg==1.16.0
-rosnode==1.16.0
-rosparam==1.16.0
-# rospkg==1.5.1
-# rospkg-modules==1.5.1
+numpy
+opencv-python
+opt-einsum
+Pillow
+protobuf
+psutil
+py-ubjson
+pyasn1
+pyasn1-modules
+pyassimp
+pycairo
+pycryptodomex
+pycups
+pydot
+Pygments
+PyGObject
+PyHamcrest
+PyJWT
+pymacaroons
+PyNaCl
+PyOpenGL
+pyOpenSSL
+pyparsing
+pypng
+PyQRCode
+PyQt5
+python-dateutil
+PyYAML
+reportlab
 rospkg
-# rospkg-modules
-rospy==1.16.0
-rosservice==1.16.0
-rostest==1.16.0
-rostopic==1.16.0
-rosunit==1.15.8
-roswtf==1.16.0
-rviz==1.14.25
-scipy==1.10.1
-sensor-msgs==1.13.1
-tf==1.13.2
-tf-slim==1.1.0
-tf2-geometry-msgs==0.7.7
-tf2-kdl==0.7.7
-tf2-py==0.7.7
-tf2-ros==0.7.7
+scipy

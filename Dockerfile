@@ -1,6 +1,7 @@
 FROM osrf/ros:noetic-desktop-full
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV CUDA_VERSION=11.8
 
 RUN apt-get update
 RUN apt-get -y install \
@@ -8,11 +9,21 @@ RUN apt-get -y install \
     python3-pip \
     curl \
     libcanberra-gtk-module \
-    libcanberra-gtk3-module
+    libcanberra-gtk3-module \
+    wget
 RUN apt-get clean
 
-RUN cd ~/
-RUN git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git /repo
-WORKDIR /repo
-RUN chmod +x ./setup2.sh benchmark_grasping2.sh
-CMD ["./setup2.sh"]
+# Install cuda
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb && \
+    dpkg -i cuda-keyring_1.0-1_all.deb && \
+    apt-get update && \
+    apt-get install -y cuda-toolkit-11-8 && \
+    rm cuda-keyring_1.0-1_all.deb
+
+# RUN git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git /root/vision_based_grasping_benchmarking
+COPY /vision_based_grasping_benchmarking/ /root/vision_based_grasping_benchmarking/
+WORKDIR /root/vision_based_grasping_benchmarking
+RUN chmod +x ./setup.sh benchmark_grasping.sh
+RUN ./setup.sh
+# WORKDIR /root/grasping_benchmarking
+# CMD ["./benchmark_grasping.sh"]
