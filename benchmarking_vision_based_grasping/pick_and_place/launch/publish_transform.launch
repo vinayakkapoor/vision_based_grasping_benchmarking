@@ -1,0 +1,8 @@
+<launch>
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="realsense_link_broadcaster1"
+        args="0.0377 -0.0446 0.0594 1.5436 0.0048 0.0027 panda_hand camera_link_temp" />
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="realsense_link_broadcaster2"
+        args="0.0147824750802 0.000306939841835 0.000341368462714 0.503393788147 -0.498659348695 0.499804609603 0.498125386056 camera_link_temp camera_link" />
+</launch>

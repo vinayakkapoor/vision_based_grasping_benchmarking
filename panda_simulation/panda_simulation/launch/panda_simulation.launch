@@ -1,0 +1,14 @@
+<launch>
+    <arg name="overhead_camera" default="false" />
+    <arg name="sim_mode" default="true" />
+    
+    <rosparam param="sim_mode" subst_value="True">$(arg sim_mode)</rosparam>
+
+    <include if="$(arg overhead_camera)" file="$(find panda_simulation)/launch/panda_overhead.launch"/>    
+    <include unless="$(arg overhead_camera)" file="$(find panda_simulation)/launch/panda_eye_in_hand.launch"/>
+
+    <node pkg="moveit_adapter" type="moveit_adapter_node.py" name="moveit_adapter_node" output="screen">
+        <param name="sim_mode" value="$(arg sim_mode)"/>
+    </node>
+
+</launch>

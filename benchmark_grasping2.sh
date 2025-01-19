@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Create a new tmux session in detached mode
+tmux new-session -d -s grasping_benchmarking
+
+# Window 0: Simulation
+tmux rename-window -t grasping_benchmarking:0 'Simulation'
+tmux send-keys -t grasping_benchmarking:0 'source "./venv/bin/activate"' C-m
+tmux send-keys -t grasping_benchmarking:0 'cd ~/grasping_benchmarking/panda_sim_ws' C-m
+tmux send-keys -t grasping_benchmarking:0 'source devel/setup.bash' C-m
+tmux send-keys -t grasping_benchmarking:0 'roslaunch panda_simulation panda_simulation.launch' C-m
+
+# Window 1: Grasp Algorithms
+tmux new-window -t grasping_benchmarking:1 -n 'Grasp Algorithms'
+tmux split-window -h -t grasping_benchmarking:1
+tmux split-window -v -t grasping_benchmarking:1
+tmux select-pane -t 0
+tmux split-window -v -t grasping_benchmarking:1
+
+# Pane 0: Mask-based Algorithm
+tmux select-pane -t grasping_benchmarking:1.0
+tmux send-keys 'sleep 15' C-m 'source "./venv/bin/activate"' C-m
+tmux send-keys 'cd ~/grasping_benchmarking/grasp_algo_ws' C-m
+tmux send-keys 'source devel/setup.bash' C-m
+tmux send-keys 'rosrun mask_based_algo service_server.py' C-m
+
+# Pane 1: GGCNN Algorithm
+tmux select-pane -t grasping_benchmarking:1.1
+tmux send-keys 'sleep 15' C-m 'source "./venv/bin/activate"' C-m
+tmux send-keys 'cd ~/grasping_benchmarking/grasp_algo_ws' C-m
+tmux send-keys 'source devel/setup.bash' C-m
+tmux send-keys 'rosrun ggcnn service_server.py' C-m
+
+# Pane 2: ROS Deep Grasp
+tmux select-pane -t grasping_benchmarking:1.2
+tmux send-keys 'sleep 15' C-m 'source "./venv/bin/activate"' C-m
+tmux send-keys 'cd ~/grasping_benchmarking/grasp_algo_ws' C-m
+tmux send-keys 'source devel/setup.bash' C-m
+tmux send-keys 'rosrun ros_deep_grasp service_server.py' C-m
+
+# Pane 3: Top Surface Algorithm
+tmux select-pane -t grasping_benchmarking:1.3
+tmux send-keys 'sleep 15' C-m 'source "./venv/bin/activate"' C-m
+tmux send-keys 'cd ~/grasping_benchmarking/grasp_algo_ws' C-m
+tmux send-keys 'source devel/setup.bash' C-m
+tmux send-keys 'roslaunch top_surface_algo top_surface.launch' C-m
+
+# Window 2: Benchmarking
+tmux new-window -t grasping_benchmarking:2 -n 'Benchmarking'
+tmux send-keys -t grasping_benchmarking:2 'source "./venv/bin/activate"' C-m
+tmux send-keys -t grasping_benchmarking:2 'cd ~/grasping_benchmarking/benchmarking_ws' C-m
+tmux send-keys -t grasping_benchmarking:2 'source devel/setup.bash' C-m
+tmux send-keys -t grasping_benchmarking:2 'roslaunch benchmarking_grasp run_benchmark.launch sim_mode:=true point_cloud_input:=false' C-m
+
+# Focus back on Simulation window
+tmux select-window -t grasping_benchmarking:0
+
+# Attach to the session
+tmux attach-session -t grasping_benchmarking

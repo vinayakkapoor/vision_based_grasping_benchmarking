@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="top_surface_algo" type="grasp_synthesis" name="grasp_synthesis" output="screen"/>
+    <node pkg="top_surface_algo" type="pyefd.py" name="pyefd" output="screen"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find top_surface_algo)/config/top_surface.rviz"/>
+</launch>

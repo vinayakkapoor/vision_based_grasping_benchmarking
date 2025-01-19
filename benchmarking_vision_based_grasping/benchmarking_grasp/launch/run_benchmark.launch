@@ -1,0 +1,31 @@
+<launch>
+    <rosparam command="load" file="$(find benchmarking_grasp)/config/configuration.yaml" />
+    
+    <!-- Parameters -->
+    <arg name="sim_mode" default="false"/>
+    <arg name="use_depth_completion" default="true"/>
+    <arg name="record_video" default="false"/>
+    <arg name="align_depth" default="true"/>
+    <arg name="point_cloud_input" default="false"/>
+    
+    <rosparam param="sim_mode" subst_value="True">$(arg sim_mode)</rosparam>
+    <rosparam param="use_depth_completion" subst_value="True">$(arg use_depth_completion)</rosparam>
+    <rosparam param="record_video" subst_value="True">$(arg record_video)</rosparam>
+    <rosparam param="align_depth" subst_value="True">$(arg align_depth)</rosparam>
+    <rosparam param="point_cloud_input" subst_value="True">$(arg point_cloud_input)</rosparam>
+
+    <include unless="$(arg sim_mode)" file="$(find pick_and_place)/launch/publish_transform.launch" />
+    <include unless="$(arg sim_mode)" file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="output" value="log"/>
+        <arg name="align_depth" value="$(arg align_depth)"/>
+        <arg name="filters" value="hole_filling"/>
+        <arg name="enable_pointcloud" value="$(arg point_cloud_input)"/>
+    </include>
+
+    <node if="$(arg point_cloud_input)" pkg="benchmarking_grasp" type="apply_point_cloud_roi" name="apply_pc_roi" output="screen"/>
+    <node if="$(arg use_depth_completion)" pkg="benchmarking_grasp" type="simple_depth_completion.py" name="simple_depth_completion" output="screen"/>
+    <node unless="$(arg point_cloud_input)" pkg="benchmarking_grasp" type="test_image_to_camera_frame.py" name="image_to_camera_node" output="screen"/>
+    <node pkg="benchmarking_grasp" type="test_cam_to_world_frame.py" name="camera_to_world_node" output="screen"/>
+    <node pkg="benchmarking_grasp" type="test_benchmark_pipeline.py" name="benchmark_test" output="screen"/>
+    <node if="$(arg record_video)" pkg="benchmarking_grasp" type="snippet_recorder.py" name="snippet_recorder" output="screen"/>
+</launch>

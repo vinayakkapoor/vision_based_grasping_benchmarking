@@ -1,0 +1,5 @@
+sensor_msgs/Image depth_image
+sensor_msgs/Image rgb_image
+---
+bool success
+mask_based_algo/Grasp2D best_grasp

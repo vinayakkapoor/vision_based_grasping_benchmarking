@@ -1,0 +1,5 @@
+Experiment,Trial,Object,Pose,Score,Inference Time
+0,0,tennis_ball,0,1,4.9e+16
+0,0,tennis_ball,1,1,2.77e+16
+0,0,tennis_ball,2,1,2.18e+16
+0,0,tennis_ball,3,1,2.31e+16

@@ -1,0 +1,41 @@
+<launch>
+
+    <!-- GAZEBO arguments -->
+    <arg name="paused" default="false" />
+    <arg name="use_sim_time" default="true" />
+    <arg name="gui" default="true" />
+    <arg name="headless" default="false" />
+    <arg name="debug" default="false" />
+    <arg name="load_gripper" default="true" />
+
+    <!--launch GAZEBO with own world configuration -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg paused)" />
+        <arg name="use_sim_time" value="$(arg use_sim_time)" />
+        <arg name="headless" value="$(arg headless)" />
+    </include>
+
+    <!-- <param name="table" command="$(find xacro)/xacro $(find pick_and_place)/urdf/table.sdf" /> -->
+    <param name="kinect" textfile="$(find pick_and_place)/urdf/kinect.urdf" />
+    <!-- <node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-param table -x 0.75 -sdf -model table" /> -->
+    <node name="spawn_kinect" pkg="gazebo_ros" type="spawn_model" args="-param kinect -urdf -model kinect" />
+
+    <!-- spawn objects-->
+
+    <!-- spawn sdfs -->
+    <param name="racquet_ball" command="$(find xacro)/xacro $(find pick_and_place)/urdf/objects/057_racquetball/racquetball.sdf" />
+    <param name="j_cups" command="$(find xacro)/xacro $(find pick_and_place)/urdf/objects/065-j_cups/j_cups.sdf" />
+    <param name="bleach_cleanser" command="$(find xacro)/xacro $(find pick_and_place)/urdf/objects/021_bleach_cleanser/bleach_cleanser.sdf" />
+    <param name="flat_screwdriver" command="$(find xacro)/xacro $(find pick_and_place)/urdf/objects/044_flat_screwdriver/flat_screwdriver.sdf" />
+    <param name="medium_clamp" command="$(find xacro)/xacro $(find pick_and_place)/urdf/objects/050_medium_clamp/medium_clamp.sdf" />
+    <param name="a_toy_airplane" command="$(find xacro)/xacro $(find pick_and_place)/urdf/objects/072-a_toy_airplane/a_toy_airplane.sdf" />
+    
+    <!-- <node name="spawn_rb" pkg="gazebo_ros" type="spawn_model" args="-param racquet_ball -x 0.5 -sdf -model racquet_ball" output="screen"/> -->
+    <!-- <node name="spawn_jc" pkg="gazebo_ros" type="spawn_model" args="-param j_cups -x 0.5 -sdf -model j_cups" output="screen"/> -->
+    <!-- <node name="spawn_bc" pkg="gazebo_ros" type="spawn_model" args="-param bleach_cleanser -x 0.5 -sdf -model bleach_cleanser" output="screen"/> -->
+    <!-- <node name="spawn_fs" pkg="gazebo_ros" type="spawn_model" args="-param flat_screwdriver -x 0.5 -sdf -model flat_screwdriver" output="screen"/> -->
+    <!-- <node name="spawn_mc" pkg="gazebo_ros" type="spawn_model" args="-param medium_clamp -x 0.5 -sdf -model medium_clamp" output="screen"/> -->
+    <!-- <node name="spawn_ata" pkg="gazebo_ros" type="spawn_model" args="-param a_toy_airplane -x 0.5 -sdf -model a_toy_airplane" output="screen"/> -->
+</launch>

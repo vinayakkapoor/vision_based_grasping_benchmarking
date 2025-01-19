@@ -1,0 +1,12 @@
+<launch>
+    <rosparam command="load" file="$(find benchmarking_grasp)/config/configuration.yaml" />
+    
+    <!-- Parameters -->
+    <arg name="sim_mode" default="false"/>
+    <arg name="use_depth_completion" default="true"/>
+    
+    <rosparam param="sim_mode" subst_value="True">$(arg sim_mode)</rosparam>
+    <rosparam param="use_depth_completion" subst_value="True">$(arg use_depth_completion)</rosparam>
+
+    <node pkg="benchmarking_grasp" type="get_depth_roi.py" name="get_depth_roi" output="screen"/>
+</launch>
