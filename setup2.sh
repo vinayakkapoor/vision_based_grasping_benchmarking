@@ -5,7 +5,7 @@ set -o pipefail  # Catch errors in pipes
 
 PYTHON_VERSION="python3.8"  # Specify Python version
 ROOT_DIR=~/grasping_benchmarking
-SRC_DIR=~/mer_lab/ros_ws/src/projects/grasping_benchmarking
+SRC_DIR=~/vision_based_grasping_benchmarking
 
 # Function to set up a workspace
 setup_workspace() {
@@ -54,7 +54,7 @@ echo "Setting up Python virtual environment with $PYTHON_VERSION..."
 $PYTHON_VERSION -m venv venv
 source "$ROOT_DIR/venv/bin/activate"
 pip install --upgrade pip setuptools wheel  # Upgrade essential tools
-pip install empy==3.3.4 defusedxml easydict shapely
+# pip install empy==3.3.4 defusedxml easydict shapely
 deactivate
 
 # Set up workspaces
