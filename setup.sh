@@ -29,6 +29,18 @@ setup_workspace() {
     cd "$ROOT_DIR"
 }
 
+get_cuda_version() {
+    if command -v nvcc &> /dev/null; then
+        cuda_version=$(nvcc --version | grep "release" | sed -E 's/.*release ([0-9]+.[0-9]+).*/\1/')
+        echo "$cuda_version"
+    elif [ -f /usr/local/cuda/version.txt ]; then
+        cuda_version=$(cat /usr/local/cuda/version.txt | grep -oP '\d+\.\d+')
+        echo "$cuda_version"
+    else
+        echo "none"
+    fi
+}
+
 # Install system dependencies
 echo "Installing apt packages..."
 sudo apt update
@@ -58,19 +70,76 @@ sudo apt install -y \
     ros-noetic-rosbridge-library \
     ros-noetic-rosbridge-server \
     ros-noetic-tf2-web-republisher
+export PYTHONPATH=$PYTHONPATH:/usr/lib/python3/dist-packages/
 
-# Create root directory
-mkdir -p "$ROOT_DIR"
+# Check if the directory exists
+if [ ! -d "$ROOT_DIR" ]; then
+    echo "Directory $ROOT_DIR does not exist. Creating..."
+    mkdir -p "$ROOT_DIR"
+else
+    echo "Directory $ROOT_DIR already exists."
+fi
+
 cd "$ROOT_DIR"
 
-# Set up Python virtual environment
-echo "Setting up Python virtual environment with $PYTHON_VERSION..."
-$PYTHON_VERSION -m venv venv
+# Check if the virtual environment exists
+if [ ! -d "$ROOT_DIR/venv" ]; then
+    echo "Virtual environment not found. Creating..."
+    $PYTHON_VERSION -m venv venv
+else
+    echo "Virtual environment already exists. Using it."
+fi
+
+# Activate the virtual environment
 source "$ROOT_DIR/venv/bin/activate"
-pip install --upgrade pip setuptools wheel  # Upgrade essential tools
-# pip install empy==3.3.4 defusedxml easydict shapely
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# Upgrade essential tools
+echo "Upgrading pip, setuptools, and wheel..."
+pip install --upgrade pip setuptools wheel
+
+# Detect CUDA version
+# Check if PyTorch is already installed
+if python -c "import torch; print(torch.__version__)" &> /dev/null; then
+    echo "PyTorch is already installed. Skipping installation."
+else
+    echo "PyTorch not found. Proceeding with installation."
+
+    # Detect CUDA version
+    cuda_version=$(get_cuda_version)
+
+    # Determine the appropriate PyTorch URL
+    if [ "$cuda_version" == "12.1" ]; then
+        url="https://download.pytorch.org/whl/cu121"
+    elif [ "$cuda_version" == "12.0" ]; then
+        url="https://download.pytorch.org/whl/cu120"
+    elif [ "$cuda_version" == "11.8" ]; then
+        url="https://download.pytorch.org/whl/cu118"
+    elif [ "$cuda_version" == "11.7" ]; then
+        url="https://download.pytorch.org/whl/cu117"
+    elif [ "$cuda_version" == "11.6" ]; then
+        url="https://download.pytorch.org/whl/cu116"
+    elif [ "$cuda_version" == "11.3" ]; then
+        url="https://download.pytorch.org/whl/cu113"
+    elif [ "$cuda_version" == "10.2" ]; then
+        url="https://download.pytorch.org/whl/cu102"
+    else
+        echo "CUDA not detected or unsupported version. Installing CPU-only PyTorch."
+        url="https://download.pytorch.org/whl/cpu"
+    fi
+
+    # Install PyTorch
+    echo "Installing PyTorch for CUDA version: $cuda_version (CPU, if CUDA version is none)."
+    pip install torch torchvision torchaudio --index-url $url
+    if [ $? -ne 0 ]; then
+        echo "PyTorch installation failed!"
+        exit 1
+    fi
+fi
+
+# Install tensorflow
 pip install tensorflow==2.10.0
+
+# Deactivate the virtual environment
 deactivate
 
 # Set up workspaces
