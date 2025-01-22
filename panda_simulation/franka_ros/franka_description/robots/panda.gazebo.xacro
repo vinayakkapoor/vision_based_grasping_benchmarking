@@ -24,6 +24,7 @@
         <xacro:macro name="finger_gazebo" params="link">
             <gazebo reference="${link}">
                 <material>Gazebo/Grey</material>
+                <gravity>false</gravity>
                 <implicitSpringDamper>1</implicitSpringDamper>
                 <kp>100000.0</kp>
                 <kd>1.0</kd>

@@ -55,7 +55,7 @@ tmux send-keys 'roslaunch top_surface_algo top_surface.launch' C-m
 
 # Window 3: Benchmarking
 tmux new-window -t grasping_benchmarking:3 -n 'Benchmarking'
-tmux send-keys -t grasping_benchmarking:3 'sleep 10' C-m
+tmux send-keys -t grasping_benchmarking:3 'sleep 15' C-m
 tmux send-keys -t grasping_benchmarking:3 'export PYTHONPATH=$PYTHONPATH:/usr/lib/python3/dist-packages/' C-m
 tmux send-keys -t grasping_benchmarking:3 'source "./venv/bin/activate"' C-m
 tmux send-keys -t grasping_benchmarking:3 'cd ~/grasping_benchmarking/benchmarking_ws' C-m

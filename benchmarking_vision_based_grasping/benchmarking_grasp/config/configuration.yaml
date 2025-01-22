@@ -5,7 +5,7 @@ enable_crop: true
 crop_by_pixel: true
 remove_noisy_ground_plane: false
 angle_2d_in_cam_frame: false
-enable_benchmark_test: false
+enable_benchmark_test: true
 
 # gripper/robot params
 gripper_offset: 0.105
