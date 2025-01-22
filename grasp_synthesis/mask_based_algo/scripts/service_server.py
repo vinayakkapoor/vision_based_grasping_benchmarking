@@ -28,7 +28,7 @@ class GraspService:
         g.width = width
         g.quality = 1
 
-        rospy.logerr("Grasp in Image frame: %s, %s, %s (%s)", g.px, g.py, g.angle, (depth.shape))
+        rospy.loginfo("Grasp in Image frame: %s, %s, %s (%s)", g.px, g.py, g.angle, (depth.shape))
 
         return response
     
