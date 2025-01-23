@@ -5,7 +5,10 @@ set -o pipefail  # Catch errors in pipes
 
 PYTHON_VERSION="python3.8"  # Specify Python version
 ROOT_DIR=~/grasping_benchmarking
-SRC_DIR=~/vision_based_grasping_benchmarking
+SRC_DIR=~/vision_based_grasping_benchmarking/grasping_benchmarking_suite
+
+# Default value for USE_CACHE is 1 (use cache) for pip installations
+USE_CACHE=1
 
 # Function to set up a workspace
 setup_workspace() {
@@ -17,16 +20,28 @@ setup_workspace() {
     mkdir -p "$ROOT_DIR/$workspace_name/src"
     cd "$ROOT_DIR/$workspace_name/src"
     cp -r "$SRC_DIR/$package_name" ./
+    
+    # Activate virtual environment
     source "$ROOT_DIR/venv/bin/activate"  # Activate virtual environment
-    pip install -r "./$package_name/$requirements_file"    
+
+    # Source ROS setup file after activating virtual environment
+    source /opt/ros/noetic/setup.bash  # Source ROS setup file
+
+    # Install dependencies, use cache or not based on USE_CACHE
+    if [ "$USE_CACHE" -eq 1 ]; then
+        pip install -r "./$package_name/$requirements_file"  # Use cache
+    else
+        pip install --no-cache-dir -r "./$package_name/$requirements_file"  # Don't use cache
+    fi
+
     # Configure Catkin to use the virtual environment's Python
     cd ..
     catkin config --extend /opt/ros/noetic \
                   --cmake-args -DPYTHON_EXECUTABLE="$ROOT_DIR/venv/bin/python3"
-    source /opt/ros/noetic/setup.bash
-    catkin build -j6
-    deactivate
-    cd "$ROOT_DIR"
+    
+    catkin build -j6  # Build the workspace
+    deactivate  # Deactivate virtual environment
+    cd "$ROOT_DIR"  # Return to the root directory
 }
 
 get_cuda_version() {
@@ -95,7 +110,7 @@ source "$ROOT_DIR/venv/bin/activate"
 
 # Upgrade essential tools
 echo "Upgrading pip, setuptools, and wheel..."
-pip install --upgrade pip setuptools wheel
+pip install --upgrade pip setuptools wheel 
 
 # Detect CUDA version
 # Check if PyTorch is already installed
@@ -129,7 +144,11 @@ else
 
     # Install PyTorch
     echo "Installing PyTorch for CUDA version: $cuda_version (CPU, if CUDA version is none)."
-    pip install torch torchvision torchaudio --index-url $url
+    if [ "$USE_CACHE" -eq 1 ]; then
+        pip install torch --index-url $url
+    else
+        pip install --no-cache-dir torch --index-url $url
+    fi
     if [ $? -ne 0 ]; then
         echo "PyTorch installation failed!"
         exit 1
@@ -137,7 +156,11 @@ else
 fi
 
 # Install tensorflow
-pip install tensorflow==2.10.0
+if [ "$USE_CACHE" -eq 1 ]; then
+    pip install tensorflow
+else
+    pip install --no-cache-dir tensorflow
+fi
 
 # Deactivate the virtual environment
 deactivate

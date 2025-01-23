@@ -37,10 +37,13 @@ PyYAML
 reportlab
 rospkg
 scipy
+# tensorflow=2.10
 tf_slim
-torch==2.4.1
-tornado==5.1.1
-triton==3.0.0
+# torch==2.0
+# tornado==5.1.1
+tornado
+triton
+# triton==3.0.0
 defusedxml
 easydict
 shapely
