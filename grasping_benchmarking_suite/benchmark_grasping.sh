@@ -13,7 +13,7 @@ tmux send-keys -t grasping_benchmarking:0 'roscore' C-m
 # Window 1: Simulation
 tmux new-window -t grasping_benchmarking:1 -n 'Simulation'
 tmux send-keys -t grasping_benchmarking:1 'sleep 5' C-m
-tmux send-keys -t grasping_benchmarking:1 'export PYTHONPATH=$PYTHONPATH:/usr/lib/python3/dist-packages/' C-m
+# tmux send-keys -t grasping_benchmarking:1 'export PYTHONPATH=$PYTHONPATH:/usr/lib/python3/dist-packages/' C-m
 tmux send-keys -t grasping_benchmarking:1 'source "./venv/bin/activate"' C-m
 tmux send-keys -t grasping_benchmarking:1 'cd ~/grasping_benchmarking/panda_sim_ws' C-m
 tmux send-keys -t grasping_benchmarking:1 'source devel/setup.bash' C-m

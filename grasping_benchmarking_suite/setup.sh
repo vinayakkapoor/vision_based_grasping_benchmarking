@@ -84,8 +84,8 @@ sudo apt install -y \
     ros-noetic-moveit-visual-tools \
     ros-noetic-rosbridge-library \
     ros-noetic-rosbridge-server \
-    ros-noetic-tf2-web-republisher
-export PYTHONPATH=$PYTHONPATH:/usr/lib/python3/dist-packages/
+    ros-noetic-tf2-web-republisher \
+    liborocos-kdl-dev
 
 # Check if the directory exists
 if [ ! -d "$ROOT_DIR" ]; then
@@ -110,7 +110,7 @@ source "$ROOT_DIR/venv/bin/activate"
 
 # Upgrade essential tools
 echo "Upgrading pip, setuptools, and wheel..."
-pip install --upgrade pip setuptools wheel 
+pip install --upgrade pip setuptools wheel importlib_metadata packaging
 
 # Detect CUDA version
 # Check if PyTorch is already installed

@@ -1,5 +1,5 @@
 catkin-pkg
-empy==3.3.4
+empy==3.3.2
 h5py
 importlib-metadata
 keras
