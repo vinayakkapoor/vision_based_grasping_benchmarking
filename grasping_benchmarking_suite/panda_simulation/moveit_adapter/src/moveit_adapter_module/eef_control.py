@@ -123,7 +123,7 @@ class MoveGroupControl:
             (plan, _) = move_group.compute_cartesian_path(
                                    cartesian_points,    # waypoints to follow
                                    0.01,                # eef_step
-                                   0.0)                 # jump_threshold
+                                   False)                 # jump_threshold # moveit API update (1.1.16) True/False for avoid_collision instead of jump_threshold
             move_group.execute(plan, wait=True)
 
     def get_current_joint_states(self):
