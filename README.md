@@ -110,5 +110,11 @@ Run `xhost -` when you're done
 
 ## Troubleshooting
 
+1. Problems with robot movement in Gazebo / moveit commander errors in computeCartesianPath():
+
+The computeCartesianPath() function in moveit commander was recently updated (see https://github.com/moveit/moveit/pull/3618).
+Please upgrade the package using     sudo apt install --only-upgrade ros-noetic-moveit-commander
+
+
 
 
