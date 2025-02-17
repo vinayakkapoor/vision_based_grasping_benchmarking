@@ -106,6 +106,22 @@ Run `xhost -` when you're done
     ./benchmark_grasping.sh
 
 ## Usage
+### Getting familiar with TMUX
+
+`./benchmark_grasping.sh` autofills and spawns multiple terminals to approriately run nodes and launch files.
+
+1. Switch between windows in tmux by pressing `Ctrl+b` then press `w`. You will be able to choose different windows. Navigate them using the `up` and `down` arrow keys.
+2. Switch between different panes (in the grasp algorithms window) by pressing `Ctrl+b` and followed by the arrow key to the pane you want to navigate to.
+3. Kill the entire session by pressing `Ctrl+b` then press `Shift+:` then type `kill-session` and press enter.
+
+For a short intro to tmux, visit [here](https://hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/). | [Tmux cheatsheets](https://github.com/ctu-mrs/mrs_cheatsheet)
+
+
+### Changing the configuration
+
+All the rosparams are loaded from `configurations.yaml` file in `grasping_benchmarking_suite/benchmarking_vision_based_grasping/benchmarking_grasp/config`
+
+Change the `grasp_in_image_frame:` to the provided values to switch the algorithm being used to generate grasps on the fly
 
 ## Architecture for grasp generation 
 
@@ -147,7 +163,7 @@ catkin build -j6
 ```
 3. **Problems with GUI when using docker**
 
-This [stackoverflow thread](https://stackoverflow.com/questions/40658095/how-to-open-ubuntu-gui-inside-a-docker-image) was incredibly helpful for troubleshooting
+    This [stackoverflow thread](https://stackoverflow.com/questions/40658095/how-to-open-ubuntu-gui-inside-a-docker-image) was incredibly helpful for troubleshooting
 
 
 
