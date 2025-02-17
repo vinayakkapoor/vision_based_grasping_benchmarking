@@ -5,10 +5,32 @@ set -o pipefail  # Catch errors in pipes
 
 PYTHON_VERSION="python3.8"  # Specify Python version
 ROOT_DIR=~/grasping_benchmarking
-SRC_DIR=~/vision_based_grasping_benchmarking/grasping_benchmarking_suite
+# SRC_DIR=~/vision_based_grasping_benchmarking/grasping_benchmarking_suite
+SRC_DIR="$PWD"
 
 # Default value for USE_CACHE is 1 (use cache) for pip installations
 USE_CACHE=1
+
+while getopts ":r:s:" opt; do
+  case ${opt} in
+    r )
+      ROOT_DIR="${OPTARG/#\~/$HOME}"
+      ;;
+    s )
+      SRC_DIR="${OPTARG/#\~/$HOME}"
+      ;;
+    \? )
+      echo "Invalid option: -$OPTARG" 1>&2
+      exit 1
+      ;;
+    : )
+      echo "Option -$OPTARG requires an argument." 1>&2
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
 
 # Function to set up a workspace
 setup_workspace() {
