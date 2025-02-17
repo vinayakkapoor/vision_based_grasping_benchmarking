@@ -1,82 +1,114 @@
 
-  
+# Towards More Robust and Reliable Vision-Based Grasping: A Benchmarking Study
 
-# Grasping benchmarking
+This is the official repository for **A Benchmarking Study of Vision-based Robotic Grasping Algorithms**
 
-  
-
-The grasing benchmarking project presents a pipeline to simulate and benchmark different grasping algorithms on the franka panda arm. Simulation, grasping algorithms and benchamarking code is combined to present a concise way to benchmark the algorithms in minimal steps.
-
-  
-
-## Getting started
-
-Clone the merlab repo, change to the `grasping_benchmarking` branch and navigate to the root of this folder
-
-    git clone git@github.com:berkcalli/mer_lab.git
-    git checkout grasp_bench_enlearning
-    cd ~/mer_lab/ros_ws/src/projects/grasping_benchmarking
-
-Make the *setup.sh* and *benchmark_grasping* file executable 
-
-    chmod +x setup.sh
-    chmod +x benchmark_grasping.sh
-
-Setup the simulation, benchmarking and grasping algorithm repos. Simply run the setup executable
-
-    ./setup.sh
-
-## What does setup.sh do?
-The bash file appropriately installs all the necessary requirements and sets up the following structure -
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/hmgh5JGP-Ak/0.jpg)](https://www.youtube.com/watch?v=hmgh5JGP-Ak)
 
 
-    grasping_benchmarking
-    ├── benchmark_grasping.sh
-    ├── benchmarking_ws
-    │   └── src
-    │       └── benchmarking_vision_based_grasping
-    │           ├── benchmarking_grasp
-    │           ├── benchmarking_msgs
-    │           ├── franka_ros
-    │           ├── grasp_plugin
-    │           ├── LICENSE
-    │           ├── moveit_adapter
-    │           ├── pick_and_place
-    │           ├── README.md
-    │           └── requirements.txt
-    ├── grasp_algo_ws
-    │   └── src
-    │       └── grasp_synthesis
-    │           ├── ggcnn
-    │           ├── mask_based_algo
-    │           ├── media
-    │           ├── README.md
-    │           ├── requirements.txt
-    │           ├── ros_deep_grasp
-    │           └── top_surface_algo
-    └── panda_sim_ws
-        └── src
-            └── panda_simulation
-                ├── franka_ros
-                ├── grasp_plugin
-                ├── LICENSE
-                ├── moveit_adapter
-                ├── panda_moveit_config
-                ├── panda_simulation
-                ├── README.md
-                └── requirements.txt
+<!---
+#### Video Demo of the benchmarking experiemnts
+<a href="https://youtu.be/hmgh5JGP-Ak" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.youtube.com/vi/hmgh5JGP-Ak/0.jpg" alt="Video Demo" width="800" height="500">
+-->
+
+## General Setup
+
+<details>
+  <summary> <b>With docker</b></summary>
+
+Make sure you have *docker* installed on your system. Refer to the official docker setup [instructions](https://docs.docker.com/engine/install/) if you do not have docker installed.
+
+Pull the docker image for this project using
+
+    docker pull vinayakapoor/grasping_benchmarking_image:v0
+
+#### Building your own docker image
+To build your own docker image, clone the repo and use `docker build`
+
+    git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git
+    cd vision_based_grasping_benchmarking
+    docker build -t grasping_benchmarking_image:v0 .
+You might need to add `sudo` depending on how your docker daemon is configured
+
+    sudo docker build -t grasping_benchmarking_image:v0 .
+</details>
+
+### Without Docker
+Clone the repo and run the setup script
+
+    git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git
+    cd vision_based_grasping_benchmarking/grasping_benchmarking_suite/
+    chmod +x benchmark_grasping.sh setup.sh
+    # Setup and build the grasping_benchmarking directory
+    ./setup.sh -r ~/grasping_benchmarking                 # Change the install directory if required
+
+<details>
+  <summary><b>But what does setup.sh do?</b></summary>
+    The bash file appropriately installs all the necessary requirements and sets up the following structure -
+
+```
+grasping_benchmarking
+├── benchmark_grasping.sh
+├── benchmarking_ws
+│   ├── build
+│   ├── devel
+│   ├── logs
+│   └── src
+├── grasp_algo_ws
+│   ├── build
+│   ├── devel
+│   ├── logs
+│   └── src
+├── panda_sim_ws
+│   ├── build
+│   ├── devel
+│   ├── logs
+│   └── src
+└── venv
+    ├── bin
+    ├── include
+    ├── lib
+    ├── lib64 -> lib
+    ├── pyvenv.cfg
+    └── share
+
+```
+</details>
 
 
 
-## What does benchmark_grasping.sh do?
-This bash file sets up 3 windows using tmux
 
-- Simulation - launches the franka panda simulation
-- Grasping algorithms - launches all the grasping algorithms in separate panes to easily see the outputs and switch algorithms on the fly
-- Benchmarking - has the command autofilled which can be run by pressing enter to start the benchmarking
 
-NOTE:
-- Use *Ctrl+b* followed be *w* and then the arrows keys to select the window
-- When in the second window, use *Ctrl+b* and then arrow keys to move between panes
-- Edit the `~/grasping_benchmarking/benchmarking_ws/src/benchmarking_vision_based_grasping/benchmarking_grasp/config/configuration.yaml` file to change the algorithm being used for benchmarking
+## Usage
+
+<details>
+  <summary><b>With Docker</b></summary>
+
+  Run the image using
+
+  ```sh
+  xhost +
+  sudo docker container run --rm -e DISPLAY=$DISPLAY --net host -v /tmp/.X11-unix:/tmp/.X11-unix -it grasping_benchmarking_image:v0
+  ```
+
+Then run the container using
+```sh
+./benchmark_grasping.sh
+```
+
+Run `xhost -` when you're done
+
+</details>
+
+
+
+### Without Docker
+
+    cd ~/grasping_benchmarking                            # Change to the install directory
+    ./benchmark_grasping.sh
+
+## Troubleshooting
+
+
 
