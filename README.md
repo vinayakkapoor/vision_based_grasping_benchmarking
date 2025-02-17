@@ -119,7 +119,7 @@ For a short intro to tmux, visit [here](https://hamvocke.com/blog/a-quick-and-ea
 
 ### Changing the configuration
 
-All the rosparams are loaded from `configurations.yaml` file in `grasping_benchmarking_suite/benchmarking_vision_based_grasping/benchmarking_grasp/config`
+All the rosparams are loaded from `configuration.yaml` file in `grasping_benchmarking_suite/benchmarking_vision_based_grasping/benchmarking_grasp/config`
 
 Change the `grasp_in_image_frame:` to the provided values to switch the algorithm being used to generate grasps on the fly
 
