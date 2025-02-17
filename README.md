@@ -113,7 +113,20 @@ Run `xhost -` when you're done
 1. Problems with robot movement in Gazebo / moveit commander errors in computeCartesianPath():
 
 The computeCartesianPath() function in moveit commander was recently updated (see https://github.com/moveit/moveit/pull/3618).
-Please upgrade the package using     sudo apt install --only-upgrade ros-noetic-moveit-commander
+Please upgrade the package using
+```sh
+sudo apt install --only-upgrade ros-noetic-moveit-commander
+```
+Consider upgrading other ROS packages if the issues persist.
+<details>
+    <summary>What if I do not want to upgrade the packages?</summary>
+    Navigate to /vision_based_grasping_benchmarking/grasping_benchmarking_suite/panda_simulation/moveit_adapter/src/moveit_adapter_module/eef_control.py
+    Change the `False` to `0.0` in _eef_control.py_
+    > (plan, _) =  move_group.compute_cartesian_path(
+    > cartesian_points, # waypoints to follow
+    > 0.01, # eef_step
+    > False)
+</details>
 
 
 
