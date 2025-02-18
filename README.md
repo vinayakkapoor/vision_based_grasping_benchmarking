@@ -105,15 +105,16 @@ Run `xhost -` when you're done
     ./benchmark_grasping.sh
 
 ## Usage
-### Getting familiar with TMUX
+### TMUX Navigation
 
-`./benchmark_grasping.sh` autofills and spawns multiple terminals to approriately run nodes and launch files.
+| Command               | Action                          |
+|-----------------------|---------------------------------|
+| `Ctrl+b` → `w`        | Window selection                |
+| `Ctrl+b` + Arrow Keys | Pane navigation                 |
+| `Ctrl+b` → `:` → `kill-session` | Terminate session          |
 
-1. Switch between windows in tmux by pressing `Ctrl+b` then press `w`. You will be able to choose different windows. Navigate them using the `up` and `down` arrow keys.
-2. Switch between different panes (in the grasp algorithms window) by pressing `Ctrl+b` and followed by the arrow key to the pane you want to navigate to.
-3. Kill the entire session by pressing `Ctrl+b` then press `Shift+:` then type `kill-session` and press enter.
-
-For a short intro to tmux, visit [here](https://hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/). | [Tmux cheatsheets](https://github.com/ctu-mrs/mrs_cheatsheet)
+*For detailed TMUX guidance, consult [this quick reference](https://hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/).*
+[Tmux cheatsheets](https://github.com/ctu-mrs/mrs_cheatsheet)
 
 
 ### Changing the configuration
