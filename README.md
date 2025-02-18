@@ -2,10 +2,9 @@
 # Towards More Robust and Reliable Vision-Based Grasping: A Benchmarking Study
 
 This is the official repository for **A Benchmarking Study of Vision-based Robotic Grasping Algorithms**
+[Youtube](https://www.youtube.com/watch?v=hmgh5JGP-Ak)
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/hmgh5JGP-Ak/0.jpg)](https://www.youtube.com/watch?v=hmgh5JGP-Ak)
-
-
+![GIF Animation](benchmarking_readme_gif.gif)
 <!---
 #### Video Demo of the benchmarking experiemnts
 <a href="https://youtu.be/hmgh5JGP-Ak" target="_blank" rel="noopener noreferrer">
@@ -125,7 +124,7 @@ Change the `grasp_in_image_frame:` to the provided values to switch the algorith
 
 ## Architecture for grasp generation 
 
-
+![Static Image](Grasping_benchmarking.png)
 
 ## Troubleshooting
 
