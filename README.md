@@ -107,7 +107,9 @@ Run `xhost -` when you're done
 
 ## Usage
 To better manage the terminals, a tmux script is provided which streamlines debugging and testing. It is recommended to use this script.
-Use ```sh ./benchmark_grasping_tmux.sh```
+Use ```sh 
+./benchmark_grasping_tmux.sh
+```
 
 If unfamiliar with tmux, ```sh ./benchmark_grasping_gnome_terminal.sh``` launches all the necessary commands in gnome terminal itself for ease of use.
 ### TMUX Navigation
