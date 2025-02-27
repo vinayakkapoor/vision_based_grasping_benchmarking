@@ -61,6 +61,7 @@ tmux send-keys -t grasping_benchmarking:3 'export PYTHONPATH=$PYTHONPATH:/usr/li
 tmux send-keys -t grasping_benchmarking:3 'source "./venv/bin/activate"' C-m
 tmux send-keys -t grasping_benchmarking:3 'cd ~/grasping_benchmarking/benchmarking_ws' C-m
 tmux send-keys -t grasping_benchmarking:3 'source devel/setup.bash' C-m
+# For the top surface algorithm, change point_cloud_input:=true
 tmux send-keys -t grasping_benchmarking:3 'roslaunch benchmarking_grasp run_benchmark.launch sim_mode:=true point_cloud_input:=false' C-m
 
 # Focus back on the roscore window
