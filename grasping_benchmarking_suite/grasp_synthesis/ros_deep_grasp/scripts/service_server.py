@@ -40,9 +40,6 @@ class GraspService:
         g.width = 0
         g.quality = 0
 
-        print(g.px, g.py, depth.shape)
-        print(x, y, depth.shape)
-
         return response
 
 if __name__ == '__main__':

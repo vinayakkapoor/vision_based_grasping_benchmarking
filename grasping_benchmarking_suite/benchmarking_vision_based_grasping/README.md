@@ -49,7 +49,7 @@ roslaunch benchmarking_grasp run_benchmark.launch sim_mode:=true point_cloud_inp
 1. Script to find depth ROI (```roslaunch benchmarking_grasp find_depth_roi.launch <args>:=<values>```)
 2. Script to find point cloud ROI (```roslaunch benchmarking_grasp find_point_cloud_roi.launch <args>:=<values>```)
 3. ```configuration.yaml``` exposes parameters to customize the setup/environment. ```example_configuration``` has sample configuration files that were used for the experimemnts.
-4. ```benchmarking.yaml``` exposes parameters specific to the benchmarking protocols and objects to be simulated
+4. ```benchmarking_experiments.yaml``` exposes parameters specific to the benchmarking protocols and objects to be simulated
 5. The configuration file and launch file arguments can be used to turn on/off the preprocessing techiques such as depth completion, filtering ROI e.t.c.
 6. Grasps can be visualized with ```visualize``` topic from ```rqt_image_view```
 7. Enable video recording with external cameras by setting ```record_video:=true``` 

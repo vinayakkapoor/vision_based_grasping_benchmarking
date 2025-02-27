@@ -24,7 +24,6 @@ import scipy
 from shapely.geometry import Polygon
 
 import time
-import kinect_subscriber as kinect
 
 pi     = scipy.pi
 dot    = scipy.dot
@@ -190,13 +189,10 @@ def run_detector(image=None):
 
     # set config
     tfconfig = tf.ConfigProto(allow_soft_placement=True)
-    print("config set")
     tfconfig.gpu_options.allow_growth=True
-    print("GPU allowed")
 
     # init session
     sess = tf.Session(config=tfconfig)
-    print("Session init")
 
     # load network
     if demonet == 'vgg16':
@@ -207,18 +203,15 @@ def run_detector(image=None):
         net = resnetv1(batch_size=1, num_layers=50)
     else:
         raise NotImplementedError
-    print("loadinggg")
     net.create_architecture(sess, "TEST", 20,
                           tag='default', anchor_scales=[8, 16, 32])
-    print("1")
     saver = tf.train.Saver()
-    print("2")
     saver.restore(sess, tfmodel)
 
     print('Loaded network {:s}'.format(tfmodel))
 
     if image is None:
-        image = kinect.get_image(show=False)
+        raise ValueError('image is None')
     
     # scores, boxes = demo(sess, net, image)
 
@@ -240,5 +233,5 @@ def run_detector(image=None):
 
 
 if __name__ == '__main__':
-    print(run_detector())
+    run_detector()
 

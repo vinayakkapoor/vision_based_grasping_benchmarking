@@ -179,9 +179,9 @@ fi
 
 # Install tensorflow
 if [ "$USE_CACHE" -eq 1 ]; then
-    pip install tensorflow
+    pip install tensorflow==2.10
 else
-    pip install --no-cache-dir tensorflow
+    pip install --no-cache-dir tensorflow==2.10
 fi
 
 # Deactivate the virtual environment

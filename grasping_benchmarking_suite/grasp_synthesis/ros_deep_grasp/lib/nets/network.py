@@ -292,33 +292,26 @@ class Network(object):
     testing = mode == 'TEST'
 
     assert tag != None
-    print("1_create")
 
     # handle most of the regularizers here
     weights_regularizer = tf.keras.regularizers.l2(cfg.TRAIN.WEIGHT_DECAY)
-    print("11_create")
     # weights_regularizer = tf.contrib.layers.l2_regularizer(cfg.TRAIN.WEIGHT_DECAY)
     if cfg.TRAIN.BIAS_DECAY:
       biases_regularizer = weights_regularizer
     else:
       biases_regularizer = tf.no_regularizer
-    print("12_create")
     # list as many types of layers as possible, even if they are not used now
     with arg_scope([slim.conv2d, slim.conv2d_in_plane, \
                     slim.conv2d_transpose, slim.separable_conv2d, slim.fully_connected], 
                     weights_regularizer=weights_regularizer,
                     biases_regularizer=biases_regularizer, 
                     biases_initializer=tf.constant_initializer(0.0)):
-      print("13_create") 
       rois, cls_prob, bbox_pred = self.build_network(sess, training)
-      print("14_create")
 
     layers_to_output = {'rois': rois}
-    print("15_create")
 
     layers_to_output.update(self._predictions)
-    print("2_create")
-
+  
     for var in tf.trainable_variables():
       self._train_summaries.append(var)
 
@@ -342,7 +335,6 @@ class Network(object):
         self._add_act_summary(var)
       for var in self._train_summaries:
         self._add_train_summary(var)
-    print("3_create")
 
     self._summary_op = tf.summary.merge_all()
     if not testing:

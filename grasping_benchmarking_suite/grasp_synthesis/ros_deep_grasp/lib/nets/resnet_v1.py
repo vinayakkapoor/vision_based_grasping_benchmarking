@@ -88,15 +88,10 @@ class resnetv1(Network):
   # Do the first few layers manually, because 'SAME' padding can behave inconsistently
   # for images of different sizes: sometimes 0, sometimes 1
   def build_base(self):
-    print("1_base")
     with tf.variable_scope(self._resnet_scope, self._resnet_scope):
-      print("2_base")
       net = resnet_utils.conv2d_same(self._image, 64, 7, stride=2, scope='conv1')
-      print("3_base")
       net = tf.pad(net, [[0, 0], [1, 1], [1, 1], [0, 0]])
-      print("4_base")
       net = slim.max_pool2d(net, [3, 3], stride=2, padding='VALID', scope='pool1')
-      print("5_base")
 
     return net
 
@@ -113,7 +108,6 @@ class resnetv1(Network):
       }])
 
   def build_network(self, sess, is_training=True):
-    print("Building network")
     # select initializers
     if cfg.TRAIN.TRUNCATED:
       initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.01)
@@ -123,7 +117,6 @@ class resnetv1(Network):
       initializer_bbox = tf.random_normal_initializer(mean=0.0, stddev=0.001)
     bottleneck = resnet_v1.bottleneck
 
-    print("1_build")
     # choose different blocks for different number of layers
     if self._num_layers == 50:
       # blocks = [
@@ -180,11 +173,9 @@ class resnetv1(Network):
     else:
       # other numbers are not supported
       raise NotImplementedError
-    print("2_build")
 
     assert (0 <= cfg.RESNET.FIXED_BLOCKS < 4)
     if cfg.RESNET.FIXED_BLOCKS == 3:
-      print("21_build")
       with slim.arg_scope(resnet_arg_scope(is_training=False)):
         net = self.build_base()
         net_conv4, _ = resnet_v1.resnet_v1(net,
@@ -193,28 +184,21 @@ class resnetv1(Network):
                                            include_root_block=False,
                                            scope=self._resnet_scope)
     elif cfg.RESNET.FIXED_BLOCKS > 0:
-      print("22_build")
       with slim.arg_scope(resnet_arg_scope(is_training=False)):
-        print("221_build")
         net = self.build_base()
-        print("222_build")
         net, _ = resnet_v1.resnet_v1(net,
                                      blocks[0:cfg.RESNET.FIXED_BLOCKS],
                                      global_pool=False,
                                      include_root_block=False,
                                      scope=self._resnet_scope)
-        print("223_build")
 
       with slim.arg_scope(resnet_arg_scope(is_training=is_training)):
-        print("224_build")
         net_conv4, _ = resnet_v1.resnet_v1(net,
                                            blocks[cfg.RESNET.FIXED_BLOCKS:-1],
                                            global_pool=False,
                                            include_root_block=False,
                                            scope=self._resnet_scope)
-        print("225_build")
     else:  # cfg.RESNET.FIXED_BLOCKS == 0
-      print("23_build")
       with slim.arg_scope(resnet_arg_scope(is_training=is_training)):
         net = self.build_base()
         net_conv4, _ = resnet_v1.resnet_v1(net,
@@ -223,7 +207,6 @@ class resnetv1(Network):
                                            include_root_block=False,
                                            scope=self._resnet_scope)
 
-    print("3_build")
     self._act_summaries.append(net_conv4)
     self._layers['head'] = net_conv4
     with tf.variable_scope(self._resnet_scope, self._resnet_scope):
@@ -263,7 +246,6 @@ class resnetv1(Network):
         pool5 = self._crop_pool_layer(net_conv4, rois, "pool5")
       else:
         raise NotImplementedError
-    print("4_build")
     with slim.arg_scope(resnet_arg_scope(is_training=is_training)):
       fc7, _ = resnet_v1.resnet_v1(pool5,
                                    blocks[-1:],
@@ -280,7 +262,6 @@ class resnetv1(Network):
       bbox_pred = slim.fully_connected(fc7, self._num_classes * 4, weights_initializer=initializer_bbox,
                                        trainable=is_training,
                                        activation_fn=None, scope='bbox_pred')
-    print("5_build")
     self._predictions["rpn_cls_score"] = rpn_cls_score
     self._predictions["rpn_cls_score_reshape"] = rpn_cls_score_reshape
     self._predictions["rpn_cls_prob"] = rpn_cls_prob

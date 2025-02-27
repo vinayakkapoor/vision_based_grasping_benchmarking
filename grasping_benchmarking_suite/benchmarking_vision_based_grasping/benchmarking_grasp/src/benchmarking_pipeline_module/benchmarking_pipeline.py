@@ -96,7 +96,7 @@ class BenchmarkTest:
 
         self.rospack = rospkg.RosPack()
         self.urdf_package_path = os.path.join(self.rospack.get_path(self.urdf_package_name), "urdf/objects")
-        self.yaml_package_path = os.path.join(self.rospack.get_path(self.yaml_package_name), "config/benchmarking.yaml")
+        self.yaml_package_path = os.path.join(self.rospack.get_path(self.yaml_package_name), "config/benchmarking_experiments.yaml")
         self.log_folder = os.path.join(self.rospack.get_path(self.yaml_package_name), "logs") 
         self.log_file_path = os.path.join(self.log_folder, "log_" +  self.start_time_str + ".csv") 
         # Create log folder if not exists
