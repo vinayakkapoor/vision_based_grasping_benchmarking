@@ -4,7 +4,7 @@ set -e  # Exit on error
 set -o pipefail  # Catch errors in pipes
 
 PYTHON_VERSION="python3.8"  # Specify Python version
-ROOT_DIR=~/grasping_benchmarking
+ROOT_DIR='$HOME/grasping_benchmarking'
 # SRC_DIR=~/vision_based_grasping_benchmarking/grasping_benchmarking_suite
 SRC_DIR="$PWD"
 
