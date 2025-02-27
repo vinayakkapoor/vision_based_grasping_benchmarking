@@ -2,10 +2,9 @@
 # Towards More Robust and Reliable Vision-Based Grasping: A Benchmarking Study
 
 This is the official repository for **A Benchmarking Study of Vision-based Robotic Grasping Algorithms**
+[Youtube](https://www.youtube.com/watch?v=hmgh5JGP-Ak)
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/hmgh5JGP-Ak/0.jpg)](https://www.youtube.com/watch?v=hmgh5JGP-Ak)
-
-
+![GIF Animation](media/benchmarking_readme_gif.gif)
 <!---
 #### Video Demo of the benchmarking experiemnts
 <a href="https://youtu.be/hmgh5JGP-Ak" target="_blank" rel="noopener noreferrer">
@@ -106,15 +105,16 @@ Run `xhost -` when you're done
     ./benchmark_grasping.sh
 
 ## Usage
-### Getting familiar with TMUX
+### TMUX Navigation
 
-`./benchmark_grasping.sh` autofills and spawns multiple terminals to approriately run nodes and launch files.
+| Command               | Action                          |
+|-----------------------|---------------------------------|
+| `Ctrl+b` → `w`        | Window selection                |
+| `Ctrl+b` + Arrow Keys | Pane navigation                 |
+| `Ctrl+b` → `:` → `kill-session` | Terminate session          |
 
-1. Switch between windows in tmux by pressing `Ctrl+b` then press `w`. You will be able to choose different windows. Navigate them using the `up` and `down` arrow keys.
-2. Switch between different panes (in the grasp algorithms window) by pressing `Ctrl+b` and followed by the arrow key to the pane you want to navigate to.
-3. Kill the entire session by pressing `Ctrl+b` then press `Shift+:` then type `kill-session` and press enter.
-
-For a short intro to tmux, visit [here](https://hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/). | [Tmux cheatsheets](https://github.com/ctu-mrs/mrs_cheatsheet)
+*For detailed TMUX guidance, consult [this quick reference](https://hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/).*
+[Tmux cheatsheets](https://github.com/ctu-mrs/mrs_cheatsheet)
 
 
 ### Changing the configuration
@@ -125,7 +125,7 @@ Change the `grasp_in_image_frame:` to the provided values to switch the algorith
 
 ## Architecture for grasp generation 
 
-
+![Static Image](media/Grasping_benchmarking.png)
 
 ## Troubleshooting
 
