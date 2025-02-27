@@ -193,5 +193,6 @@ setup_workspace "panda_sim_ws" "panda_simulation" "requirements.txt"
 setup_workspace "grasp_algo_ws" "grasp_synthesis" "requirements.txt"
 
 # Copy additional scripts
-cp "$SRC_DIR/benchmark_grasping.sh" "$ROOT_DIR/"
+cp "$SRC_DIR/benchmark_grasping_tmux.sh" "$ROOT_DIR/"
+cp "$SRC_DIR/benchmark_grasping_gnome_terminal.sh" "$ROOT_DIR/"
 echo "All setups complete!"
