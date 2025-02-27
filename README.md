@@ -102,7 +102,8 @@ Run `xhost -` when you're done
 ### Without Docker
 
     cd ~/grasping_benchmarking                            # Change to the install directory
-    ./benchmark_grasping_gnome_terminal.sh
+    ./benchmark_grasping_tmux.sh
+    # ./bebenchmark_grasping_gnome_terminal.sh            # If unfamiliar with tmux navigation
 
 ## Usage
 To better manage the terminals, a tmux script is provided which streamlines debugging and testing. It is recommended to use this script.
