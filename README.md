@@ -38,7 +38,7 @@ Clone the repo and run the setup script
 
     git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git
     cd vision_based_grasping_benchmarking/grasping_benchmarking_suite/
-    chmod +x benchmark_grasping.sh setup.sh
+    chmod +x benchmark_grasping_tmux.sh benchmark_grasping_gnome_terminal.sh setup.sh
     # Setup and build the grasping_benchmarking directory
     ./setup.sh -r ~/grasping_benchmarking                 # Change the install directory if required
 
@@ -90,7 +90,7 @@ grasping_benchmarking
 
 Then run the container using
 ```sh
-./benchmark_grasping.sh
+./benchmark_grasping_tmux.sh
 ```
 
 Run `xhost -` when you're done
@@ -102,9 +102,14 @@ Run `xhost -` when you're done
 ### Without Docker
 
     cd ~/grasping_benchmarking                            # Change to the install directory
-    ./benchmark_grasping.sh
+    ./benchmark_grasping_tmux.sh
+    # ./benchmark_grasping_gnome_terminal.sh              # If unfamiliar with tmux navigation
 
 ## Usage
+To better manage the terminals, a tmux script is provided which streamlines debugging and testing. It is recommended to use this script.
+Use `./benchmark_grasping_tmux.sh`
+
+If unfamiliar with tmux, ```sh ./benchmark_grasping_gnome_terminal.sh``` launches all the necessary commands in gnome terminal itself for ease of use.
 ### TMUX Navigation
 
 | Command               | Action                          |
