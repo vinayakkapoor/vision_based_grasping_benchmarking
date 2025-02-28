@@ -7,11 +7,9 @@ if str(ROOT) not in sys.path:
 
 import rospy
 import numpy as np
-import math
-import cv2
 
 from grasp import run_detector
-from ggcnn.srv import Grasp2DPrediction, Grasp2DPredictionResponse, Grasp2DPredictionRequest
+from ros_deep_grasp.srv import Grasp2DPrediction, Grasp2DPredictionResponse
 
 import cv_bridge
 bridge = cv_bridge.CvBridge()
