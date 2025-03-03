@@ -169,7 +169,7 @@ fi
 
 # Install tensorflow
 if [ "$USE_CACHE" -eq 1 ]; then
-    pip install numpy==1.24.1 tensorflow==2.10
+    pip install numpy==1.26.2 tensorflow==2.10
 else
     pip install --no-cache-dir numpy==1.26.2 tensorflow==2.10
 fi
