@@ -11,34 +11,39 @@ endif()
 #dependencies 
 
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
+
+# ## Generate messages and services
+# rosidl_generate_interfaces(${PROJECT_NAME}
+#   "msg/Grasp2D.msg"
+#   "srv/Grasp2DPrediction.srv"
+#   DEPENDENCIES std_msgs geometry_msgs sensor_msgs
+# )
 
 ## Include directories
 include_directories(
   include
+  ${rclcpp_INCLUDE_DIRS}
   ${std_msgs_INCLUDE_DIRS}
 )
 
-install(DIRECTORY ros_deep_grasp/ros_deep_grasp_module/
-  DESTINATION share/${PROJECT_NAME}/
-)
-install(DIRECTORY ros_deep_grasp/ros_deep_grasp_module/lib/utils
-  DESTINATION share/${PROJECT_NAME}/utils
-)
-install(DIRECTORY ros_deep_grasp/ros_deep_grasp_module/lib/model
-  DESTINATION share/${PROJECT_NAME}/model
-)
-
+#install(DIRECTORY ros_deep_grasp/ggcnn_module/
+#  DESTINATION share/${PROJECT_NAME}/
+#)
 
 install(PROGRAMS
-  ros_deep_grasp/service_server.py
+  scripts/service_server.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
+
+#ament_python_install_package(${PROJECT_NAME})
 ament_package()
 
 

@@ -27,11 +27,11 @@ tmux send-keys 'source install/setup.bash' C-m
 tmux send-keys 'ros2 run ggcnn service_server.py' C-m
 
 ## Pane 2: ROS Deep Grasp
-#tmux select-pane -t grasping_benchmarking:2.2
-#tmux send-keys 'sleep 15' C-m 'source "./venv/bin/activate"' C-m
-#tmux send-keys 'cd ~/$ROOT_DIR/grasp_algo_ws' C-m
-#tmux send-keys 'source install/setup.bash' C-m
-#tmux send-keys 'ros2 run ros_deep_grasp service_server.py' C-m
+tmux select-pane -t grasping_benchmarking:2.2
+tmux send-keys 'sleep 15' C-m 'source "./venv/bin/activate"' C-m
+tmux send-keys 'cd ./grasp_algo_ws' C-m
+tmux send-keys 'source install/setup.bash' C-m
+tmux send-keys 'ros2 run ros_deep_grasp service_server.py' C-m
 
 # Pane 3: Top Surface Algorithm
 #tmux select-pane -t grasping_benchmarking:2.3

@@ -1,5 +1,8 @@
 catkin_pkg
 cython
+easydict
 empy==3.3.2
 lark
+matplotlib
 scipy
+tf-slim

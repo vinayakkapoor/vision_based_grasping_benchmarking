@@ -21,12 +21,14 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/CurrentPose.srv"
   "srv/SetJointVelocity.srv"
   "srv/MoveJointRelative.srv"
+  "srv/EFDGrasp.srv"
   DEPENDENCIES
     geometry_msgs
     sensor_msgs
 )
 include_directories(
   include
+  # ${PCL_INCLUDE_DIRS}
 )
 install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}

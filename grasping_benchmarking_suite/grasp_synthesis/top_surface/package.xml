@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>ros_deep_grasp</name>
+  <name>top_surface</name>
   <version>0.0.0</version>
-  <description>The ros_deep_grasp package</description>
+  <description>The top_surface package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -20,15 +20,11 @@
   <!-- Authors do not have to be maintainers, but could be -->
   <!-- Example: -->
   <!-- <author email="rbhalekar@wpi.edu">Jane Doe</author> -->
-
-  <member_of_group>rosidl_interface_packages</member_of_group>
   
   
    <!-- Build tool dependencies -->
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <buildtool_depend>ament_cmake_auto</buildtool_depend>
-  <buildtool_depend>rosidl_default_generators</buildtool_depend>
-  
+  <buildtool_depend>ament_cmake_auto</buildtool_depend> 
 
 
   <!-- Build dependencies -->
@@ -47,6 +43,8 @@
   <build_depend>geometry_msgs</build_depend>
 
   <depend>grasp_interfaces</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
 
 
 
