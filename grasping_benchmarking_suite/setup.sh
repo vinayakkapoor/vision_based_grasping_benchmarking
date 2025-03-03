@@ -3,13 +3,15 @@
 set -e  # Exit on error
 set -o pipefail  # Catch errors in pipes
 
-PYTHON_VERSION="python3.8"  # Specify Python version
-ROOT_DIR=$HOME/grasping_benchmarking
+PYTHON_VERSION="python3.10"  # Specify Python version
+ROOT_DIR=$HOME/grasping_benchmarking_2
 # SRC_DIR=~/vision_based_grasping_benchmarking/grasping_benchmarking_suite
 SRC_DIR="$PWD"
 
 # Default value for USE_CACHE is 1 (use cache) for pip installations
 USE_CACHE=1
+
+ROS_DISTRO=$(ls /opt/ros | tail -n 1)  # Gets the latest ROS version available
 
 while getopts ":r:s:" opt; do
   case ${opt} in
@@ -46,8 +48,8 @@ setup_workspace() {
     # Activate virtual environment
     source "$ROOT_DIR/venv/bin/activate"  # Activate virtual environment
 
-    # Source ROS setup file after activating virtual environment
-    source /opt/ros/noetic/setup.bash  # Source ROS setup file
+    # Source ROS2 setup file after activating virtual environment
+    source /opt/ros/$ROS_DISTRO/setup.bash
 
     # Install dependencies, use cache or not based on USE_CACHE
     if [ "$USE_CACHE" -eq 1 ]; then
@@ -56,12 +58,8 @@ setup_workspace() {
         pip install --no-cache-dir -r "./$package_name/$requirements_file"  # Don't use cache
     fi
 
-    # Configure Catkin to use the virtual environment's Python
     cd ..
-    catkin config --extend /opt/ros/noetic \
-                  --cmake-args -DPYTHON_EXECUTABLE="$ROOT_DIR/venv/bin/python3"
-    
-    catkin build -j6  # Build the workspace
+    colcon build --symlink-install
     deactivate  # Deactivate virtual environment
     cd "$ROOT_DIR"  # Return to the root directory
 }
@@ -82,33 +80,11 @@ get_cuda_version() {
 echo "Installing apt packages..."
 sudo apt update
 sudo apt install -y \
-    ros-noetic-combined-robot-hw \
-    ros-noetic-tf-conversions \
     $PYTHON_VERSION \
     $PYTHON_VERSION-venv \
     $PYTHON_VERSION-dev \
     python3-pip \
-    libgirepository1.0-dev \
-    libcups2-dev \
-    python3-pykdl \
-    liborocos-kdl-dev \
-    tmux \
-    ros-noetic-dynamic-reconfigure \
-    python3-catkin-tools \
-    ros-noetic-libfranka \
-    python3-osrf-pycommon \
-    libpcap-dev \
-    libpng-dev \
-    libusb-1.0-0-dev \
-    ros-noetic-moveit \
-    ros-noetic-effort-controllers \
-    ros-noetic-joint-trajectory-controller \
-    ros-noetic-moveit-visual-tools \
-    ros-noetic-rosbridge-library \
-    ros-noetic-rosbridge-server \
-    ros-noetic-tf2-web-republisher \
-    liborocos-kdl-dev
-
+    tmux 
 # Check if the directory exists
 if [ ! -d "$ROOT_DIR" ]; then
     echo "Directory $ROOT_DIR does not exist. Creating..."
@@ -167,9 +143,9 @@ else
     # Install PyTorch
     echo "Installing PyTorch for CUDA version: $cuda_version (CPU, if CUDA version is none)."
     if [ "$USE_CACHE" -eq 1 ]; then
-        pip install torch --index-url $url
+        pip install numpy==1.24.1 torch==2.1 --index-url $url
     else
-        pip install --no-cache-dir torch --index-url $url
+        pip install --no-cache-dir numpy==1.24.1 torch==2.1 --index-url $url
     fi
     if [ $? -ne 0 ]; then
         echo "PyTorch installation failed!"
@@ -179,9 +155,9 @@ fi
 
 # Install tensorflow
 if [ "$USE_CACHE" -eq 1 ]; then
-    pip install tensorflow==2.10
+    pip install numpy==1.24.1 tensorflow==2.10
 else
-    pip install --no-cache-dir tensorflow==2.10
+    pip install --no-cache-dir numpy==1.24.1 tensorflow==2.10
 fi
 
 # Deactivate the virtual environment
@@ -189,7 +165,7 @@ deactivate
 
 # Set up workspaces
 setup_workspace "benchmarking_ws" "benchmarking_vision_based_grasping" "requirements.txt"
-setup_workspace "panda_sim_ws" "panda_simulation" "requirements.txt"
+#setup_workspace "panda_sim_ws" "panda_simulation" "requirements.txt"
 setup_workspace "grasp_algo_ws" "grasp_synthesis" "requirements.txt"
 
 # Copy additional scripts

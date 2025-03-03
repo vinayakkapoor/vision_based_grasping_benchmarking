@@ -1,60 +1,48 @@
-cmake_minimum_required(VERSION 2.4.6)
+cmake_minimum_required(VERSION 3.8)
 project(ros_deep_grasp)
-# include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+# Default to C++17
+# set(CMAKE_CXX_STANDARD 17)
+# set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  message_generation
-  std_msgs
-  sensor_msgs
-  geometry_msgs
-)
-add_message_files(
-  FILES
-  Grasp.msg
-  Grasp2D.msg
-)
+#dependencies 
 
-# Generate services in the 'srv' folder
-add_service_files(
- FILES
- GraspPrediction.srv
- Grasp2DPrediction.srv
-)
-
-## Generate added messages and services with any dependencies listed here
-generate_messages(
- DEPENDENCIES
- std_msgs
- geometry_msgs
- sensor_msgs
-)
+find_package(ament_cmake REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES mask_based_algo
-#  CATKIN_DEPENDS roscpp rospy std_msgs
-#  DEPENDS system_lib
-  CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs message_runtime
-)
-
+## Include directories
 include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
+  include
+  ${std_msgs_INCLUDE_DIRS}
 )
 
+install(DIRECTORY ros_deep_grasp/ros_deep_grasp_module/
+  DESTINATION share/${PROJECT_NAME}/
+)
+install(DIRECTORY ros_deep_grasp/ros_deep_grasp_module/lib/utils
+  DESTINATION share/${PROJECT_NAME}/utils
+)
+install(DIRECTORY ros_deep_grasp/ros_deep_grasp_module/lib/model
+  DESTINATION share/${PROJECT_NAME}/model
+)
+
+
+install(PROGRAMS
+  ros_deep_grasp/service_server.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+ament_package()
+
+
+
+
+
+  

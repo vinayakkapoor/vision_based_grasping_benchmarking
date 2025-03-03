@@ -1,8 +1,23 @@
-from distutils.core import setup
-from catkin_pkg.python_setup import generate_distutils_setup
+from setuptools import setup
 
-d = generate_distutils_setup()
-d['packages'] = ['ggcnn']
-d['package_dir'] = {'': 'src'}
+package_name = 'ggcnn'
 
-setup(**d)
+setup(
+    name=package_name,
+    version='0.0.1',
+    packages=[package_name],
+    package_dir={'': 'src'},
+    install_requires=['setuptools'],
+    zip_safe=True,
+    maintainer='rhea',
+    maintainer_email='rhea@example.com',
+    description='GGCNN implementation',
+    license='Apache-2.0',
+    tests_require=['pytest'],
+    entry_points={
+        'console_scripts': [
+            'ggcnn_node = ggcnn.ggcnn_node:main',
+        ],
+    },
+)
+

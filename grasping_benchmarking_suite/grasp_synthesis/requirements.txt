@@ -1,49 +1,5 @@
-catkin-pkg
+catkin_pkg
+cython
 empy==3.3.2
-h5py
-importlib-metadata
-keras
-lxml
-lz4
-matplotlib
-numpy
-opencv-python
-opt-einsum
-Pillow
-protobuf
-psutil
-py-ubjson
-pyasn1
-pyasn1-modules
-pyassimp
-pycairo
-pycryptodomex
-pycups
-pydot
-Pygments
-PyGObject
-PyHamcrest
-PyJWT
-pymacaroons
-PyNaCl
-PyOpenGL
-pyOpenSSL
-pyparsing
-pypng
-PyQRCode
-PyQt5
-python-dateutil
-PyYAML
-reportlab
-rospkg
+lark
 scipy
-# tensorflow=2.10
-tf_slim
-# torch==2.0
-# tornado==5.1.1
-tornado
-triton
-# triton==3.0.0
-defusedxml
-easydict
-shapely

@@ -1,5 +1,0 @@
-BraceWrapping:
-  AfterFunction: false
-ColumnLimit: 120
-AllowShortBlocksOnASingleLine: true
-AllowShortIfStatementsOnASingleLine: false

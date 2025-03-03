@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Load the path to the configuration file -->
+  <let name="config_file" 
+       value="$(find-pkg-share benchmarking_grasp)/config/configuration.yaml" />
+  
+  <!-- Launch the benchmarking node -->
+  <node pkg="benchmarking_grasp" 
+        exec="benchmarking_pipeline_2.py"
+        name="benchmarking_node"
+        output="screen">
+    <param from="$(var config_file)"/>
+  </node>
+  
+  <!-- Log the configuration file path -->
+  <!-- <log>Loading parameters from: $(var config_file)</log> -->
+</launch>
