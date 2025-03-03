@@ -3,8 +3,22 @@
 set -e  # Exit on error
 set -o pipefail  # Catch errors in pipes
 
-PYTHON_VERSION="python3.10"  # Specify Python version
-ROOT_DIR=$HOME/grasping_benchmarking
+#PYTHON_VERSION="python3.12"  # Specify Python version
+UBUNTU_VERSION=$(lsb_release -rs)
+
+# Decide Python version based on Ubuntu version
+if [[ "$UBUNTU_VERSION" == "20."* ]]; then
+    PYTHON_VERSION="python3.8"
+elif [[ "$UBUNTU_VERSION" == "22."* ]]; then
+    PYTHON_VERSION="python3.10"
+elif [[ "$UBUNTU_VERSION" == "24."* ]]; then
+    PYTHON_VERSION="python3.12"
+else
+    echo "Unsupported Ubuntu version: $UBUNTU_VERSION"
+    exit 1
+fi
+
+ROOT_DIR=$HOME/grasping_benchmarking_3
 # SRC_DIR=~/vision_based_grasping_benchmarking/grasping_benchmarking_suite
 SRC_DIR="$PWD"
 

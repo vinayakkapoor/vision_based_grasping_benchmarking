@@ -1,4 +1,4 @@
-FROM osrf/ros:noetic-desktop-full
+FROM osrf/ros:jazzy-desktop-full-noble
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CUDA_VERSION=11.8
@@ -37,9 +37,11 @@ RUN apt-get clean
 #     rm cuda-keyring_1.0-1_all.deb
 
 RUN git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git /root/vision_based_grasping_benchmarking/
+WORKDIR /root/vision_based_grasping_benchmarking/
+RUN git checkout ros2
 # COPY /grasping_benchmarking_suite /root/vision_based_grasping_benchmarking/grasping_benchmarking_suite/
 WORKDIR /root/vision_based_grasping_benchmarking/grasping_benchmarking_suite/
-RUN chmod +x ./setup.sh benchmark_grasping.sh
+RUN chmod +x ./setup.sh benchmark_grasping_tmux.sh benchmark_grasping_gnome_terminal.sh
 RUN ./setup.sh
 WORKDIR /root/grasping_benchmarking
 # CMD ["./benchmark_grasping.sh"]
