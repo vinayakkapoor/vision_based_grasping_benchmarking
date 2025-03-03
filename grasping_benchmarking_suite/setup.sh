@@ -157,9 +157,9 @@ else
     # Install PyTorch
     echo "Installing PyTorch for CUDA version: $cuda_version (CPU, if CUDA version is none)."
     if [ "$USE_CACHE" -eq 1 ]; then
-        pip install numpy==1.26.2 torch==2.1 --index-url $url
+        pip install numpy==1.26.2 torch==2.2 --index-url $url
     else
-        pip install --no-cache-dir numpy==1.26.2 torch==2.1 --index-url $url
+        pip install --no-cache-dir numpy==1.26.2 torch==2.2 --index-url $url
     fi
     if [ $? -ne 0 ]; then
         echo "PyTorch installation failed!"
