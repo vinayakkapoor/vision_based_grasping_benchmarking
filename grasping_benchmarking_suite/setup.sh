@@ -99,8 +99,7 @@ sudo apt install -y \
     $PYTHON_VERSION-dev \
     python3-pip \
     tmux \
-    ros-$ROS_DISTRO-gazebo-msgs \
-    ros-$ROS_DISTRO-gazebo-ros-pkgs 
+    ros-$ROS_DISTRO-gazebo-msgs 
 # Check if the directory exists
 if [ ! -d "$ROOT_DIR" ]; then
     echo "Directory $ROOT_DIR does not exist. Creating..."
