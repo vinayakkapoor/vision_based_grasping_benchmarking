@@ -2,4 +2,5 @@ catkin_pkg
 cython
 empy==3.3.2
 lark
+open3d
 scipy

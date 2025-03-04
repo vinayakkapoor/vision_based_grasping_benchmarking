@@ -49,11 +49,11 @@ benchmarking_node:
     # Mask based algorithm 
     # grasp_in_image_frame: "/mask_based_grasp_service/predict"
     # GGCNN
-    # grasp_in_image_frame: "/ggcnn_grasp_service/predict"
+    grasp_in_image_frame: "/ggcnn_grasp_service/predict"
     # Resnet
     # grasp_in_image_frame: "/resnet_deep_grasp_service/predict"
     # Top Surface algorithm
-    grasp_in_image_frame: "/top_surface_grasp_service/predict"
+    # grasp_in_image_frame: "/top_surface_grasp_service/predict"
     # ----------------------------------------------------------
 
     grasp_in_camera_frame: "coords_in_cam" # NOT NEEDED IN ROS2 IMPLEMENTATION
