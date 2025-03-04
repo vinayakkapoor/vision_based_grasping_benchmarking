@@ -18,7 +18,7 @@ import numpy as np
 import os, cv2
 import argparse
 
-from nets.vgg16 import vgg16
+#from nets.vgg16 import vgg16
 from nets.resnet_v1 import resnetv1
 import scipy
 from shapely.geometry import Polygon

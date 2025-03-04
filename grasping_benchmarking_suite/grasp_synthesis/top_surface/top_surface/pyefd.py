@@ -25,32 +25,53 @@ class EFDDetector(Node):
         self.get_logger().info('EFD detector service started')
 
     def handle_get_grasp(self, request, response):
+        self.get_logger().error("SERVICE REQUEST RECEIVED")
         '''
         Service callback for grasp point calculation
         '''
         self.get_logger().info("Received grasp request")
-        point_cloud = np.array(list(read_points(request.input_cloud, skip_nans=True)))
+        
+        # Read point cloud data properly using field names
+        points = list(read_points(request.input_cloud, field_names=("x", "y", "z"), skip_nans=True))
+        
+        if not points:
+            self.get_logger().error("Empty point cloud received")
+            return response
+
+        # Convert to numpy array with proper shape (N, 3)
+        point_cloud = np.array([(p[0], p[1], p[2]) for p in points])
+        
         self.get_logger().info(f"Point Cloud shape: {point_cloud.shape}")
         
-        z_mean = np.mean(point_cloud[:, 2])    
-        self.get_logger().info("Mean found")
-        grasp = self.get_grasp(point_cloud[:, :2], visualize=False, split=True)
-        self.get_logger().info("grasp found")
-        grasp = np.hstack((grasp, np.ones((grasp.shape[0], 1)) * z_mean))
-        
-        header = request.input_cloud.header
-        header.stamp = self.get_clock().now().to_msg()
+        try:
+            z_mean = np.mean(point_cloud[:, 2])
+            self.get_logger().info("Mean found")
+            
+            # Use only x,y coordinates for grasp calculation
+            grasp = self.get_grasp(point_cloud[:, :2], visualize=True, split=True)
+            self.get_logger().info("grasp found")
+            
+            # Add z-coordinate back to grasp points
+            grasp = np.hstack((grasp, np.ones((grasp.shape[0], 1)) * z_mean))
+            
+            header = request.input_cloud.header
+            header.stamp = self.get_clock().now().to_msg()
 
-        # Create fields for the PointCloud2 message
-        fields = [
-            PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
-            PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
-            PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1)
-        ]
+            # Create fields for the PointCloud2 message
+            fields = [
+                PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
+                PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
+                PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1)
+            ]
 
-        # Create the PointCloud2 message
-        response.grasp_points = create_cloud(header, fields, grasp)
-        self.get_logger().info("point_cloud created")
+            # Create the PointCloud2 message
+            response.output_cloud = create_cloud(header, fields, grasp)
+            self.get_logger().info("point_cloud created")
+            
+        except Exception as e:
+            self.get_logger().error(f"Error processing grasp: {str(e)}")
+            return response
+
         return response
         
     def elliptic_fourier_descriptors(self, contour, order=10):

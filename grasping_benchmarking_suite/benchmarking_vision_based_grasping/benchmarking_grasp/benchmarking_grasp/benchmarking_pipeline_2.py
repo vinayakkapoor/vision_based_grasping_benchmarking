@@ -93,12 +93,20 @@ class Benchmark(Node):
         self.reentrant_callback_group = ReentrantCallbackGroup()
         self.bridge = cv_bridge.CvBridge()
 
+                
         # Initialise services
-        self.grasp_client = self.create_client(
-            Grasp2DPrediction,
+        if self.grasp_in_image_frame_service == '/top_surface_grasp_service/predict':
+            self.grasp_client_pointcloud = self.create_client(
+            GraspPrediction,
             self.grasp_in_image_frame_service,
             callback_group=self.reentrant_callback_group
         )
+        else:
+            self.grasp_client = self.create_client(
+                Grasp2DPrediction,
+                self.grasp_in_image_frame_service,
+                callback_group=self.reentrant_callback_group
+            )
         # NOT TESTED
         self.spawn_model_client = self.create_client(
             SpawnModel,
@@ -169,11 +177,10 @@ class Benchmark(Node):
         self.urdf_path = os.path.join(get_package_share_directory(self.urdf_package_name), "urdf/objects")
         self.experiments_config_path = os.path.join(get_package_share_directory(self.experiments_package_name), self.experiments_config_relative_path)
         PACKAGE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-        self.RESULTS_DIR = os.path.join(PACKAGE_ROOT, "src/benchmarking_grasp/results")
+        self.RESULTS_DIR = os.path.join(PACKAGE_ROOT, "src/benchmarking_vision_based_grasping/benchmarking_grasp/results")
         os.makedirs(self.RESULTS_DIR, exist_ok=True)
         start_time_str = str(datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"))
         self.RESULTS_FILE = os.path.join(self.RESULTS_DIR, "benchmarking_result_" +  start_time_str + ".csv")
-        print(self.RESULTS_FILE, "----------------------------")
         with open(self.RESULTS_FILE, 'w') as file:
             header = ['Experiment', 'Trial', 'Object', 'Pose', 'Score', 'Inference Time']
             writer = csv.writer(file)
@@ -375,9 +382,27 @@ class Benchmark(Node):
         """
         start_time = self.get_clock().now()
         
-        grasp_in_img_frame, rgb_img, depth_img = self.get_grasp_in_img_frame()
-        grasp_in_cam_frame = self.grasp_img2cam(grasp_in_img_frame, rgb_img, depth_img)
-        grasp_in_world_frame:GraspPrediction.Response = self.grasp_cam2world(grasp_in_cam_frame)
+        grasp_in_world_frame = None
+        if self.grasp_in_image_frame_service != '/top_surface_grasp_service/predict':
+            grasp_in_img_frame, rgb_img, depth_img = self.get_grasp_in_img_frame()
+            grasp_in_cam_frame = self.grasp_img2cam(grasp_in_img_frame, rgb_img, depth_img)
+            grasp_in_world_frame:GraspPrediction.Response = self.grasp_cam2world(grasp_in_cam_frame)
+        else:
+            grasp_request = GraspPrediction.Request()  # This is correct since the request has no fields
+            future = self.grasp_client_pointcloud.call_async(grasp_request)
+            self.get_logger().info("Waiting for top surface service to return")
+            rclpy.spin_until_future_complete(self, future)
+            if future.done():
+                try:
+                    result = future.result()
+                    grasp_in_cam_frame = result
+                    self.get_logger().info('Grasp service returned successfully')
+                    # Process result here
+                except Exception as e:
+                    self.get_logger().error(f'Service call failed with {e}')
+
+            grasp_in_world_frame:GraspPrediction.Response = self.grasp_cam2world(grasp_in_cam_frame)            
+
         
         end_time = self.get_clock().now()
     
@@ -466,24 +491,22 @@ class Benchmark(Node):
         self.pick_and_place.call_set_joint_velocity_service(self.robot_default_velocity)
     
     
-    def test_execute_benchmarking(self):
-        self.get_logger().info("Executing benchmark")
-        if not self.over_head:
-            self.pick_and_place.setScanPose(x=self.scan_pose[0], y=self.scan_pose[1], z=self.scan_pose[2], 
-                                            roll=self.scan_pose[3], pitch=self.scan_pose[4], yaw=self.scan_pose[5])
-            if self.use_cartesian:
-                self.pick_and_place.reach_cartesian_scanpose()
-            else:
-                self.pick_and_place.reach_scanpose()
+    # def test_execute_benchmarking(self):
+    #     self.get_logger().info("Executing benchmark")
+    #     if not self.over_head:
+    #         self.pick_and_place.setScanPose(x=self.scan_pose[0], y=self.scan_pose[1], z=self.scan_pose[2], 
+    #                                         roll=self.scan_pose[3], pitch=self.scan_pose[4], yaw=self.scan_pose[5])
+    #         if self.use_cartesian:
+    #             self.pick_and_place.reach_cartesian_scanpose()
+    #         else:
+    #             self.pick_and_place.reach_scanpose()
                 
-        for i in range(10):
-            time.sleep(5)
-            grasp_in_img_frame, rgb_img, depth_img = self.get_grasp_in_img_frame()
-            grasp_in_cam_frame = self.grasp_img2cam(grasp_in_img_frame, rgb_img, depth_img)
-            grasp_in_world_frame = self.grasp_cam2world(grasp_in_cam_frame)
-
-            print(grasp_in_world_frame)
-            # self.get_logger().info(self.get_grasp_in_img_frame())
+    #     for i in range(10):
+    #         time.sleep(5)
+    #         grasp_in_img_frame, rgb_img, depth_img = self.get_grasp_in_img_frame()
+    #         grasp_in_cam_frame = self.grasp_img2cam(grasp_in_img_frame, rgb_img, depth_img)
+    #         grasp_in_world_frame = self.grasp_cam2world(grasp_in_cam_frame)
+    #         # self.get_logger().info(self.get_grasp_in_img_frame())
 
 
     def grasp_img2cam(self, grasp_in_img_frame:Grasp2DPrediction.Response, rgb_img, depth_img):
@@ -529,6 +552,7 @@ class Benchmark(Node):
         
         return result
     
+    # NOT TESTED
     def spawn_model(self, model_path, pose):
         """
         Spawns model in the required pose in Gazebo

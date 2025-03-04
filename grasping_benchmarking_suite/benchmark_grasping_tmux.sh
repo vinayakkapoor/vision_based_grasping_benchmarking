@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ROOT_DIR=$HOME/grasping_benchmarking_2
+ROOT_DIR=$HOME/grasping_benchmarking
 # Create a new tmux session in detached mode
 tmux new-session -d -s grasping_benchmarking
 
@@ -34,11 +34,11 @@ tmux send-keys 'source install/setup.bash' C-m
 tmux send-keys 'ros2 run ros_deep_grasp service_server.py' C-m
 
 # Pane 3: Top Surface Algorithm
-#tmux select-pane -t grasping_benchmarking:2.3
-#tmux send-keys 'sleep 15' C-m 'source "./venv/bin/activate"' C-m
-#tmux send-keys 'cd ~/$ROOT_DIR/grasp_algo_ws' C-m
-#tmux send-keys 'source install/setup.bash' C-m
-#tmux send-keys 'ros2 launch top_surface_algo top_surface.launch' C-m
+tmux select-pane -t grasping_benchmarking:2.3
+tmux send-keys 'sleep 15' C-m 'source "./venv/bin/activate"' C-m
+tmux send-keys 'cd ./grasp_algo_ws' C-m
+tmux send-keys 'source install/setup.bash' C-m
+tmux send-keys 'ros2 launch top_surface top_surface.launch' C-m
 
 # Window 3: Benchmarking
 tmux new-window -t grasping_benchmarking:3 -n 'Benchmarking'
@@ -47,7 +47,6 @@ tmux send-keys -t grasping_benchmarking:3 'sleep 15' C-m
 tmux send-keys -t grasping_benchmarking:3 'source "./venv/bin/activate"' C-m
 tmux send-keys -t grasping_benchmarking:3 'cd ./benchmarking_ws' C-m
 tmux send-keys -t grasping_benchmarking:3 'source install/setup.bash' C-m
-# For the top surface algorithm, change point_cloud_input:=true
 tmux send-keys -t grasping_benchmarking:3 'ros2 launch benchmarking_grasp launch_benchmarking_pipeline.xml' C-m
 
 # Focus back on the roscore window

@@ -43,7 +43,7 @@ public:
         //     "coords_in_cam",
         //     std::bind(&PtCloudClass::getGrasp, this, std::placeholders::_1, std::placeholders::_2));
         service = this->create_service<grasp_interfaces::srv::GraspPrediction>(
-            "coords_in_cam",
+            "/top_surface_grasp_service/predict",
             [this](const std::shared_ptr<grasp_interfaces::srv::GraspPrediction::Request> req,
                 std::shared_ptr<grasp_interfaces::srv::GraspPrediction::Response> res) {
                 this->getGrasp(req, res);
@@ -326,14 +326,15 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr PtCloudClass::calculateHull(pcl::PointCloud<
 }
 
 
-std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> PtCloudClass::getEFDGrasp(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds){
+std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> PtCloudClass::getEFDGrasp(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds) {
     std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> fl_clouds;
 
-    int count = 0;
-    for (auto CloudPtr : clouds){
+    for (auto CloudPtr : clouds) {
+        // Create a temporary node for the client
+        auto client_node = std::make_shared<rclcpp::Node>("temp_client_node");
+        auto client = client_node->create_client<grasp_interfaces::srv::EFDGrasp>("/top_surface_grasp_service/predict");
 
-        auto client = this->create_client<grasp_interfaces::srv::EFDGrasp>("/top_surface_grasp_service/predict");
-
+        // Wait for the service
         while (!client->wait_for_service(std::chrono::seconds(1))) {
             if (!rclcpp::ok()) {
                 RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for service.");
@@ -342,34 +343,33 @@ std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> PtCloudClass::getEFDGrasp(st
             RCLCPP_INFO(this->get_logger(), "Waiting for service to appear...");
         }
 
-        // Create input and output messages
+        // Prepare and send the request
         sensor_msgs::msg::PointCloud2 input_cloud;
-        sensor_msgs::msg::PointCloud2 output_cloud;
-        
         pcl::toROSMsg(*CloudPtr, input_cloud);
-          
         auto request = std::make_shared<grasp_interfaces::srv::EFDGrasp::Request>();
         request->input_cloud = input_cloud;
-        
+
         auto result = client->async_send_request(request);
-        
-        // Wait for the result
-        if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result) ==
-            rclcpp::FutureReturnCode::SUCCESS) {
-            // Copy the output message from the service response
+        sensor_msgs::msg::PointCloud2 output_cloud;  // Declare outside if block
+
+        // Process the response
+        if (rclcpp::spin_until_future_complete(client_node, result) == rclcpp::FutureReturnCode::SUCCESS) {
             output_cloud = result.get()->output_cloud;
             RCLCPP_INFO(this->get_logger(), "Service call successful");
         } else {
-            RCLCPP_ERROR(this->get_logger(), "Failed to call service %s", client->get_service_name());
-            return fl_clouds;
+            RCLCPP_ERROR(this->get_logger(), "Service call failed");
+            continue;  // Skip to next iteration if service failed
         }
-        
+
+        // Process the output cloud
         pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::fromROSMsg(output_cloud, *pcl_cloud);
+
+        // Rest of the processing...
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_rgb(new pcl::PointCloud<pcl::PointXYZRGB>);
         pcl::copyPointCloud(*pcl_cloud, *cloud_rgb);
         
-        pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_vis (new pcl::PointCloud<pcl::PointXYZRGB>);
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_vis(new pcl::PointCloud<pcl::PointXYZRGB>);
         pcl::copyPointCloud(*CloudPtr, *cloud_vis);
 
         pcl::PointXYZRGB grasppoint;

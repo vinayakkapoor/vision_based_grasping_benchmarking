@@ -3,16 +3,16 @@
     <!-- Launch pyEFD node -->
     <node 
         pkg="top_surface" 
-        exec="pyefd.py"
-        name="efd_detector"
+        exec="graspSynthesis.py"
+        name="grasp_synthesis_node"
         output="screen"
     />
     
-    <!-- Launch grasp synthesis node -->
+    <!-- Launch grasp synthesis node
     <node 
         pkg="top_surface" 
         exec="grasp_synthesis_node"
         name="grasp_synthesis"
         output="screen"
-    />
+    /> -->
 </launch>

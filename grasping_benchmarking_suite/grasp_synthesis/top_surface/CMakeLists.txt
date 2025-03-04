@@ -51,6 +51,7 @@ ament_target_dependencies(grasp_synthesis_node
 
 install(PROGRAMS
   top_surface/pyefd.py
+  top_surface/graspSynthesis.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
