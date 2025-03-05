@@ -133,6 +133,18 @@ Change the `grasp_in_image_frame:` to the provided values to switch the algorith
 
 ![Static Image](media/Grasping_benchmarking.png)
 
+## Helpful Features
+
+1. **Add custom objects to benchmark in the simulation**
+
+Custom _sdf_ models of the objects can be added to `vision_based_grasping_benchmarking/grasping_benchmarking_suite/benchmarking_vision_based_grasping/pick_and_place/urdf/objects/`, with the format <object_name dir>/<object_name>.sdf. 
+
+Make sure to edit the `https://github.com/vinayakkapoor/vision_based_grasping_benchmarking/blob/master/grasping_benchmarking_suite/benchmarking_vision_based_grasping/benchmarking_grasp/config/benchmarking_experiments.yaml` to include your custom object in the experiments!
+
+For example, add a folder named "hammer" to the _objects folder_ and put your "hammer.sdf" file in it. Then edit the _benchmarking_experiments.yaml_ file to include "hammer"
+
+2. **Add custom grasping algorithms to benchmark**
+
 ## Troubleshooting
 
 1. **Problems with robot movement in Gazebo / MoveIt Commander errors in `computeCartesianPath()`:**
