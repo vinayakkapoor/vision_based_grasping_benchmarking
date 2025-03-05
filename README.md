@@ -86,7 +86,7 @@ grasping_benchmarking
 
   ```sh
   xhost +
-  sudo docker container run --rm -e DISPLAY=$DISPLAY --net host -v /tmp/.X11-unix:/tmp/.X11-unix -it grasping_benchmarking_image:v0
+  sudo docker container run --rm -e DISPLAY=$DISPLAY --net host -v /tmp/.X11-unix:/tmp/.X11-unix -it vinayakapoor/grasping_benchmarking_image:v0
   ```
 
 Then run the container using
