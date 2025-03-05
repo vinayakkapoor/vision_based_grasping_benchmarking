@@ -33,7 +33,8 @@ You might need to add `sudo` depending on how your docker daemon is configured
     sudo docker build -t grasping_benchmarking_image:v0 .
 </details>
 
-### Without Docker
+**Without Docker**
+
 Clone the repo and run the setup script
 
     git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git
@@ -99,7 +100,7 @@ Run `xhost -` when you're done
 
 
 
-### Without Docker
+**Without Docker**
 
     cd ~/grasping_benchmarking                            # Change to the install directory
     ./benchmark_grasping_tmux.sh
