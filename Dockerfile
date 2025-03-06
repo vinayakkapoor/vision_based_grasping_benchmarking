@@ -39,7 +39,7 @@ RUN apt-get clean
 RUN git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git /root/vision_based_grasping_benchmarking/
 # COPY /grasping_benchmarking_suite /root/vision_based_grasping_benchmarking/grasping_benchmarking_suite/
 WORKDIR /root/vision_based_grasping_benchmarking/grasping_benchmarking_suite/
-RUN chmod +x ./setup.sh benchmark_grasping.sh
+RUN chmod +x ./setup.sh benchmark_grasping_tmux.sh benchmark_grasping_gnome_terminal.sh
 RUN ./setup.sh
 WORKDIR /root/grasping_benchmarking
 # CMD ["./benchmark_grasping.sh"]

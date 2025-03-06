@@ -195,4 +195,10 @@ setup_workspace "grasp_algo_ws" "grasp_synthesis" "requirements.txt"
 # Copy additional scripts
 cp "$SRC_DIR/benchmark_grasping_tmux.sh" "$ROOT_DIR/"
 cp "$SRC_DIR/benchmark_grasping_gnome_terminal.sh" "$ROOT_DIR/"
+
+source "$ROOT_DIR/venv/bin/activate" 
+pip install gdown
+echo "Pulling weights for ros_deep_grasp"
+gdown --folder "https://drive.google.com/drive/folders/1_lmlbCGlOhQPfu_aLM_1dDZQnNdRK7sX" -O "$ROOT_DIR/grasp_algo_ws/src/grasp_synthesis/ros_deep_grasp/"
+deactivate
 echo "All setups complete!"
