@@ -33,7 +33,8 @@ You might need to add `sudo` depending on how your docker daemon is configured
     sudo docker build -t grasping_benchmarking_image:v0 .
 </details>
 
-### Without Docker
+**Without Docker**
+
 Clone the repo and run the setup script
 
     git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git
@@ -85,7 +86,7 @@ grasping_benchmarking
 
   ```sh
   xhost +
-  sudo docker container run --rm -e DISPLAY=$DISPLAY --net host -v /tmp/.X11-unix:/tmp/.X11-unix -it grasping_benchmarking_image:v0
+  sudo docker container run --rm -e DISPLAY=$DISPLAY --net host -v /tmp/.X11-unix:/tmp/.X11-unix -it vinayakapoor/grasping_benchmarking_image:v0
   ```
 
 Then run the container using
@@ -99,7 +100,7 @@ Run `xhost -` when you're done
 
 
 
-### Without Docker
+**Without Docker**
 
     cd ~/grasping_benchmarking                            # Change to the install directory
     ./benchmark_grasping_tmux.sh
@@ -131,6 +132,18 @@ Change the `grasp_in_image_frame:` to the provided values to switch the algorith
 ## Architecture for grasp generation 
 
 ![Static Image](media/Grasping_benchmarking.png)
+
+## Helpful Features
+
+1. **Add custom objects to benchmark in the simulation**
+
+Custom _sdf_ models of the objects can be added to `vision_based_grasping_benchmarking/grasping_benchmarking_suite/benchmarking_vision_based_grasping/pick_and_place/urdf/objects/`, with the format <object_name dir>/<object_name>.sdf. 
+
+Make sure to edit the `https://github.com/vinayakkapoor/vision_based_grasping_benchmarking/blob/master/grasping_benchmarking_suite/benchmarking_vision_based_grasping/benchmarking_grasp/config/benchmarking_experiments.yaml` to include your custom object in the experiments!
+
+For example, add a folder named "hammer" to the _objects folder_ and put your "hammer.sdf" file in it. Then edit the _benchmarking_experiments.yaml_ file to include "hammer"
+
+2. **Add custom grasping algorithms to benchmark**
 
 ## Troubleshooting
 
