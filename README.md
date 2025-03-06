@@ -20,8 +20,8 @@ Make sure you have *docker* installed on your system. Refer to the official dock
 
 Pull the docker image for this project using
 
-    docker pull vinayakapoor/grasping_benchmarking_image:v0
-
+    docker pull vinayakapoor/grasping_benchmarking_image:ros1_v0
+    
 #### Building your own docker image
 To build your own docker image, clone the repo and use `docker build`
 
