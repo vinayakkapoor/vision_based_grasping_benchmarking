@@ -145,6 +145,8 @@ For example, add a folder named "hammer" to the _objects folder_ and put your "h
 
 2. **Add custom grasping algorithms to benchmark**
 
+A template algorithm is provided in the `grasping_benchmarking_suite/grasp_synthesis`. Implement the predict function in the `service_server.py` for your custom algorithm, and all the ROS part is taken care of by the script!
+
 ## Troubleshooting
 
 1. **Problems with robot movement in Gazebo / MoveIt Commander errors in `computeCartesianPath()`:**
