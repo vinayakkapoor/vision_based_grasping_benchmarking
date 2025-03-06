@@ -127,7 +127,9 @@ If unfamiliar with tmux, ```sh ./benchmark_grasping_gnome_terminal.sh``` launche
 
 All the rosparams are loaded from `configuration.yaml` file in `grasping_benchmarking_suite/benchmarking_vision_based_grasping/benchmarking_grasp/config`
 
-Change the `grasp_in_image_frame:` to the provided values to switch the algorithm being used to generate grasps on the fly
+Change the `grasp_in_image_frame:` to the provided values to switch the algorithm being used to generate grasps on the fly.
+
+**NOTE:** Do NOT forget to change the pointcloud_input:=true in the `benchmark_grasping_tmux.sh` when using **top_surface_algo**. Please use pointcloud_input:=false for the other three algorithms.
 
 ## Architecture for grasp generation 
 
