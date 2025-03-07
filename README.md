@@ -35,6 +35,9 @@ You might need to add `sudo` depending on how your docker daemon is configured
 </details>
 
 ### Without Docker
+
+PREREQUISITES: ROS Humble / Jazzy
+
 Clone the repo and run the setup script
 
     git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git
