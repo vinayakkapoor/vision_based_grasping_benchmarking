@@ -16,5 +16,5 @@ gnome-terminal --tab -- bash -c "source ./venv/bin/activate; source ./grasp_algo
 sleep 10
 
 # Third terminal window (Single tab)
-gnome-terminal --window -- bash -c "export PYTHONPATH=$PYTHONPATH:/usr/lib/python3/dist-packages/; source ./venv/bin/activate; source ./benchmarking_ws/devel/setup.bash; roslaunch benchmarking_grasp run_benchmark.launch sim_mode:=true point_cloud_input:=false; exec bash"
+gnome-terminal --window -- bash -c "export PYTHONPATH=$PYTHONPATH:/usr/lib/python3/dist-packages/; source ./venv/bin/activate; source ./benchmarking_ws/devel/setup.bash; roslaunch benchmarking_grasp run_benchmark.launch sim_mode:=true; exec bash"
 

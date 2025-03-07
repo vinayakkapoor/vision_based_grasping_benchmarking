@@ -39,7 +39,7 @@ class PtCloudClass{
     
     PtCloudClass(ros::NodeHandle& nh) : n(nh){
         pub = n.advertise<sensor_msgs::PointCloud2>("filtered_cloud", 3);
-        ros::ServiceServer service = n.advertiseService("coords_in_cam", &PtCloudClass::getGrasp, this);
+        ros::ServiceServer service = n.advertiseService("/top_surface_grasp_service/predict", &PtCloudClass::getGrasp, this);
         // pt_cloud_sub = n.subscribe<sensor_msgs::PointCloud2>("/camera/depth/color/roi_points", 5, &PtCloudClass::ptCloudCallback, this);
         pt_cloud_sub = n.subscribe<sensor_msgs::PointCloud2>("/panda_camera/depth/points", 5, &PtCloudClass::ptCloudCallback, this);
         camera_frame = "panda_camera_optical_link";
@@ -322,7 +322,7 @@ std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> PtCloudClass::getEFDGrasp(st
     int count = 0;
     for (auto CloudPtr : clouds){
 
-        ros::ServiceClient client = n.serviceClient<top_surface_algo::EFDGrasp>("/top_surface_grasp_service/predict");
+        ros::ServiceClient client = n.serviceClient<top_surface_algo::EFDGrasp>("/top_surface_grasp_service/predict_efd_grasp");
 
         // Create input and output messages
         sensor_msgs::PointCloud2 input_cloud;

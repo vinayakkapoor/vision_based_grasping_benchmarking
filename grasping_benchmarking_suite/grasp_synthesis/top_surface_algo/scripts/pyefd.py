@@ -371,6 +371,6 @@ if __name__ == "__main__":
     # get_grasp_from_img_file('test1.jpg')
 
     rospy.init_node('efd_detector')
-    rospy.Service('/top_surface_grasp_service/predict', EFDGrasp, handle_get_grasp)
+    rospy.Service('/top_surface_grasp_service/predict_efd_grasp', EFDGrasp, handle_get_grasp)
     
     rospy.spin()
