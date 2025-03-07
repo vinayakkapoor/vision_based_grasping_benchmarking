@@ -152,6 +152,14 @@ For example, add a folder named "hammer" to the _objects folder_ and put your "h
 
 A template algorithm is provided in the `grasping_benchmarking_suite/grasp_synthesis`. Implement the predict function in the `service_server.py` for your custom algorithm, and all the ROS part is taken care of by the script!
 
+3. **Add custom gripper to benchmark**
+
+The configurations.yaml file provides several parameters to extend the benchmarking framework to a variety of grippers - 
+
+_gripper_height_: The code removes noisy ground-plane values in the depth image by adjusting depth values based on the gripper height. Specifically, it modifies depths greater than a certain threshold (calculated based on the gripper's height) to ensure the grasping point is sufficiently above the ground plane
+_gripper_width_: The width of the gripper is used to adjust the size of the bounding box (rectangular region) around a predicted grasp. This ensures that the grasp region is appropriately scaled to the gripper's dimensions, allowing for more accurate depth and pose calculations.
+
+
 ## Troubleshooting
 
 1. **Problems with robot movement in Gazebo / MoveIt Commander errors in `computeCartesianPath()`:**
