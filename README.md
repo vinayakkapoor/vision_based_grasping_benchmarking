@@ -35,6 +35,8 @@ You might need to add `sudo` depending on how your docker daemon is configured
 
 **Without Docker**
 
+PREREQUISITES: ROS Noetic
+
 Clone the repo and run the setup script
 
     git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git
