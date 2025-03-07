@@ -20,8 +20,8 @@ Make sure you have *docker* installed on your system. Refer to the official dock
 
 Pull the docker image for this project using
 
-    docker pull vinayakapoor/grasping_benchmarking_image:v0
-
+    docker pull vinayakapoor/grasping_benchmarking_image:ros1_v0
+    
 #### Building your own docker image
 To build your own docker image, clone the repo and use `docker build`
 
@@ -127,7 +127,9 @@ If unfamiliar with tmux, ```sh ./benchmark_grasping_gnome_terminal.sh``` launche
 
 All the rosparams are loaded from `configuration.yaml` file in `grasping_benchmarking_suite/benchmarking_vision_based_grasping/benchmarking_grasp/config`
 
-Change the `grasp_in_image_frame:` to the provided values to switch the algorithm being used to generate grasps on the fly
+Change the `grasp_in_image_frame:` to the provided values to switch the algorithm being used to generate grasps on the fly.
+
+**NOTE:** Do NOT forget to change the point_cloud_input:=true in the `benchmark_grasping_tmux.sh` when using **top_surface_algo**. Please use point_cloud_input:=false for the other three algorithms.
 
 ## Architecture for grasp generation 
 
@@ -144,6 +146,8 @@ Make sure to edit the `https://github.com/vinayakkapoor/vision_based_grasping_be
 For example, add a folder named "hammer" to the _objects folder_ and put your "hammer.sdf" file in it. Then edit the _benchmarking_experiments.yaml_ file to include "hammer"
 
 2. **Add custom grasping algorithms to benchmark**
+
+A template algorithm is provided in the `grasping_benchmarking_suite/grasp_synthesis`. Implement the predict function in the `service_server.py` for your custom algorithm, and all the ROS part is taken care of by the script!
 
 ## Troubleshooting
 
