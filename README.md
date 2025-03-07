@@ -20,14 +20,14 @@ Make sure you have *docker* installed on your system. Refer to the official dock
 
 Pull the docker image for this project using
 
-    docker pull vinayakapoor/grasping_benchmarking_image:ros1_v0
+    docker pull vinayakapoor/grasping_benchmarking_image:ros1_v1
     
 #### Building your own docker image
 To build your own docker image, clone the repo and use `docker build`
 
     git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git
     cd vision_based_grasping_benchmarking
-    docker build -t grasping_benchmarking_image:v0 .
+    docker build -t grasping_benchmarking_image:ros1_v2 .
 You might need to add `sudo` depending on how your docker daemon is configured
 
     sudo docker build -t grasping_benchmarking_image:v0 .
@@ -129,7 +129,6 @@ All the rosparams are loaded from `configuration.yaml` file in `grasping_benchma
 
 Change the `grasp_in_image_frame:` to the provided values to switch the algorithm being used to generate grasps on the fly.
 
-**NOTE:** Do NOT forget to change the point_cloud_input:=true in the `benchmark_grasping_tmux.sh` when using **top_surface_algo**. Please use point_cloud_input:=false for the other three algorithms.
 
 ## Architecture for grasp generation 
 
