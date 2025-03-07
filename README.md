@@ -160,6 +160,8 @@ _gripper_height_: The code removes noisy ground-plane values in the depth image 
 
 _gripper_width_: The width of the gripper is used to adjust the size of the bounding box (rectangular region) around a predicted grasp. This ensures that the grasp region is appropriately scaled to the gripper's dimensions, allowing for more accurate depth and pose calculations.
 
+_gripper_offset_: The gripper_offset is used to adjust the height at which the gripper operates. This ensures that the robot's gripper is at an appropriate height relative to the object being picked or placed.
+
 
 ## Troubleshooting
 
