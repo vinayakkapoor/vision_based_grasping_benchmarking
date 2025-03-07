@@ -96,6 +96,8 @@ Then run the container using
 
 Run `xhost -` when you're done
 
+Change the grasping algorithm using `vim ./benchmarking_ws/src/benchmarking_vision_based_grasping/benchmarking_grasp/config/configuration.yaml` and changing the _grasp_in_image_frame_ parameter 
+
 </details>
 
 
