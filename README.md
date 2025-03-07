@@ -1,7 +1,7 @@
 
 # Towards More Robust and Reliable Vision-Based Grasping: A Benchmarking Study
 
-This is the official repository for **A Benchmarking Study of Vision-based Robotic Grasping Algorithms**
+This is the official ros2 branch for **A Benchmarking Study of Vision-based Robotic Grasping Algorithms**
 [Youtube](https://www.youtube.com/watch?v=hmgh5JGP-Ak)
 
 ![GIF Animation](media/benchmarking_readme_gif.gif)
@@ -11,6 +11,7 @@ This is the official repository for **A Benchmarking Study of Vision-based Robot
     <img src="https://img.youtube.com/vi/hmgh5JGP-Ak/0.jpg" alt="Video Demo" width="800" height="500">
 -->
 
+PS - The ros2 implementation is STILL UNDER DEVELOPMENT.
 ## General Setup
 
 <details>
