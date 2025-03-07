@@ -30,7 +30,7 @@ To build your own docker image, clone the repo and use `docker build`
     docker build -t grasping_benchmarking_image:ros1_v2 .
 You might need to add `sudo` depending on how your docker daemon is configured
 
-    sudo docker build -t grasping_benchmarking_image:v0 .
+    sudo docker build -t grasping_benchmarking_image:ros1_v2 .
 </details>
 
 **Without Docker**
@@ -86,7 +86,7 @@ grasping_benchmarking
 
   ```sh
   xhost +
-  sudo docker container run --rm -e DISPLAY=$DISPLAY --net host -v /tmp/.X11-unix:/tmp/.X11-unix -it vinayakapoor/grasping_benchmarking_image:v0
+  sudo docker container run --rm -e DISPLAY=$DISPLAY --net host -v /tmp/.X11-unix:/tmp/.X11-unix -it vinayakapoor/grasping_benchmarking_image:ros1_v1
   ```
 
 Then run the container using
