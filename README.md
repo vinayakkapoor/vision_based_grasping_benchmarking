@@ -133,6 +133,8 @@ All the rosparams are loaded from `configuration.yaml` file in `grasping_benchma
 
 Change the `grasp_in_image_frame:` to the provided values to switch the algorithm being used to generate grasps on the fly.
 
+**Note**: The wooden texture described in the paper was created by printing a wooden pattern and applying it to the grasping surface. For reproducibility, we provide the same pattern at `/media/wooden_pattern.jpg` 
+
 
 ## Architecture for grasp generation 
 
