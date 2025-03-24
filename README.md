@@ -102,13 +102,12 @@ Change the grasping algorithm using `vim ./benchmarking_ws/src/benchmarking_visi
 
 </details>
 
-
-
 **Without Docker**
 
     cd ~/grasping_benchmarking                            # Change to the install directory
     ./benchmark_grasping_tmux.sh
     # ./benchmark_grasping_gnome_terminal.sh              # If unfamiliar with tmux navigation
+
 
 ## Usage
 To better manage the terminals, a tmux script is provided which streamlines debugging and testing. It is recommended to use this script.
@@ -163,6 +162,60 @@ _gripper_height_: The code removes noisy ground-plane values in the depth image 
 _gripper_width_: The width of the gripper is used to adjust the size of the bounding box (rectangular region) around a predicted grasp. This ensures that the grasp region is appropriately scaled to the gripper's dimensions, allowing for more accurate depth and pose calculations.
 
 _gripper_offset_: The gripper_offset is used to adjust the height at which the gripper operates. This ensures that the robot's gripper is at an appropriate height relative to the object being picked or placed.
+
+4. 
+    <details>
+      <summary><b>Running on the real robot</b></summary>
+    To run the benchmarking on the real robot (using ROS1), we would need
+    
+    1.  Rgb / depth images / pointcloud (if running top surface algo) / camera intrinsics being published on appropriate ros topics.
+    
+    
+        a.  To set these ros topics please navigate to the  _configuration.yaml_ file in */benchmarking_vision_based_grasping/benchmarking_grasp/config/*
+    
+        b.  Set these parameters for your camera (they are currently set for realsense)
+
+        > cam_info_depth_align: '/camera/aligned_depth_to_color/camera_info'      # cam_info: '/camera/depth/camera_info'
+        
+        > cam_info_depth: '/camera/depth/camera_info'
+        
+        > point_cloud: "/camera/depth/color/points"
+        
+        > depth_wo_align_image: '/camera/depth/image_rect_raw'
+        
+        > depth_image: '/camera/aligned_depth_to_color/image_raw'
+        
+        > rgb_image: '/camera/color/image_raw'
+      
+        
+        
+        c.  In the benchmark_grasping_tmux.sh (or the benchmarking_grasping_gnome.sh - whichever you're using), set **sim_mode:=false** (instead of true)  
+        
+        
+        > tmux send-keys -t grasping_benchmarking:3 'roslaunch benchmarking_grasp run_benchmark.launch sim_mode:=true' C-m
+    
+    
+    
+        d.  This would launch the realsense camera node and setup static tf transforms appropriately. If you wish to modify this for any other camera, please edit the `/benchmarking_vision_based_grasping/benchmarking_grasp/launch  
+        /run_benchmark.launch` launch file
+    
+    2. Franka panda with moveit
+    
+    
+        a.  Do not run the simulation by commenting out the following 
+        in benchmark_grasping_tmux.sh
+        
+        > tmux send-keys -t grasping_benchmarking:1 'roslaunch panda_simulation
+        > panda_simulation.launch' C-m
+        
+        
+        b.  Instead, run the panda with moveit using
+        
+        
+        c.  `roslaunch panda_moveit_config panda_control_moveit_rviz.launch robot_ip:=<ip> load_gripper:=true`
+        
+        d.  `rosrun moveit_adapter moveit_adapter.py` (in the benchmarking_ws)
+    </details>
 
 
 ## Troubleshooting
