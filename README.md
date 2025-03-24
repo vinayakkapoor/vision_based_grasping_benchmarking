@@ -109,6 +109,9 @@ Change the grasping algorithm using `vim ./benchmarking_ws/src/benchmarking_visi
     # ./benchmark_grasping_gnome_terminal.sh              # If unfamiliar with tmux navigation
 
 
+![Demo](media/sim_demo.gif)
+
+
 ## Usage
 To better manage the terminals, a tmux script is provided which streamlines debugging and testing. It is recommended to use this script.
 Use `./benchmark_grasping_tmux.sh`
