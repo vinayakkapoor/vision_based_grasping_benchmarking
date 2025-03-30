@@ -64,6 +64,7 @@ setup_workspace() {
 
     # Source ROS2 setup file after activating virtual environment
     source /opt/ros/$ROS_DISTRO/setup.bash
+    source ~/IsaacSim-ros_workspaces/humble_ws/install/setup.bash
 
     # Install dependencies, use cache or not based on USE_CACHE
     if [ "$USE_CACHE" -eq 1 ]; then

@@ -6,7 +6,7 @@
   
   <!-- Launch the benchmarking node -->
   <node pkg="benchmarking_grasp" 
-        exec="benchmarking_pipeline_2.py"
+        exec="benchmarking_pipeline.py"
         name="benchmarking_node"
         output="screen">
     <param from="$(var config_file)"/>

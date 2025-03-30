@@ -18,6 +18,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(gazebo_msgs REQUIRED)
 # find_package(pcl_conversions REQUIRED)
+find_package(isaac_ros2_messages)
 
 include_directories(
   include
@@ -48,7 +49,7 @@ endif()
 
 # Install the package
 install(PROGRAMS
-  benchmarking_grasp/benchmarking_pipeline_2.py
+  benchmarking_grasp/benchmarking_pipeline.py
   # grasp_synthesis_node
   DESTINATION lib/${PROJECT_NAME}
 )
