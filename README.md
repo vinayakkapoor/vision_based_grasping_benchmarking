@@ -12,7 +12,7 @@ This is the official repository for **A Benchmarking Study of Vision-based Robot
 -->
 
 ## General Setup
-
+(Docker with isaac sim + benchmarking currently under development)
 <details>
   <summary> <b>With docker</b></summary>
 
@@ -38,9 +38,10 @@ Clone the repo and run the setup script
 
     git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git
     cd vision_based_grasping_benchmarking/grasping_benchmarking_suite/
+    git checkout isaacsim_ros2
     chmod +x benchmark_grasping_tmux.sh benchmark_grasping_gnome_terminal.sh setup.sh
     # Setup and build the grasping_benchmarking directory
-    ./setup.sh -r ~/grasping_benchmarking                 # Change the install directory if required
+    ./setup.sh -r ~/grasping_benchmarking_ros2                 # Change the install directory if required
 
 <details>
   <summary><b>But what does setup.sh do?</b></summary>
@@ -75,7 +76,7 @@ grasping_benchmarking
 ```
 </details>
 
-
+(Currently under development for this branch, please try without docker)
 ## Running Benchmarking
 
 <details>
@@ -131,6 +132,27 @@ Change the `grasp_in_image_frame:` to the provided values to switch the algorith
 ## Architecture for grasp generation 
 
 ![Static Image](media/Grasping_benchmarking.png)
+
+## Installing Isaac Sim
+Navigate to [Isaac Sim](https://docs.isaacsim.omniverse.nvidia.com/latest/installation/download.html)
+
+Download **Isaac Sim 4.2** for Linux
+
+(This repo has ONLY been tested with Isaac Sim **4.2** - NOT 4.5 which is the latest version)
+
+Extract it to a folder of your choice
+
+## Running Isaac Sim
+```
+cd <isaac sim folder>
+source ~/grasping_benchmarking_ros2/IsaacSim-ros_workspaces/humble_ws/install/setup.bash
+./isaac-sim.selector.sh
+```
+Make sure to select `omni.isaac.ros2_bridge` under ROS Bridge Extension.
+
+Click Start.
+
+Go to `File > Import` and select `franka_table_v1.usd` present at the base of this repo.
 
 ## Troubleshooting
 
