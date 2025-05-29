@@ -1,0 +1,17 @@
+#python@3.9
+numpy
+opencv-python
+matplotlib
+scikit-image
+imageio
+tensorboard
+tensorboardX
+pyrealsense2
+Pillow
+imagecodecs
+-f https://download.pytorch.org/whl/torch_stable.html
+torch==2.0.0+cu117
+torchvision==0.15.1+cu117
+torchaudio==2.0.1 
+torchsummary
+

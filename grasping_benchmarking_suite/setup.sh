@@ -18,7 +18,7 @@ else
     exit 1
 fi
 
-ROOT_DIR=$HOME/grasping_benchmarking_3
+ROOT_DIR=$HOME/grasping_benchmarking
 # SRC_DIR=~/vision_based_grasping_benchmarking/grasping_benchmarking_suite
 SRC_DIR="$PWD"
 
@@ -64,7 +64,13 @@ setup_workspace() {
 
     # Source ROS2 setup file after activating virtual environment
     source /opt/ros/$ROS_DISTRO/setup.bash
-    source ~/IsaacSim-ros_workspaces/humble_ws/install/setup.bash
+    # if [ "$package_name" == "grasp_synthesis" ]; then
+    #     # mv ./trained_models ./grasp_algo_ws/src/grasp_synthesis/ensemble/ensemble/ensemble_module/
+    # fi
+    if [ "$package_name" == "benchmarking_vision_based_grasping" ]; then
+        source $ROOT_DIR/IsaacSim-ros_workspaces/humble_ws/install/setup.bash
+    fi
+    
 
     # Install dependencies, use cache or not based on USE_CACHE
     if [ "$USE_CACHE" -eq 1 ]; then
@@ -99,8 +105,7 @@ sudo apt install -y \
     $PYTHON_VERSION-venv \
     $PYTHON_VERSION-dev \
     python3-pip \
-    tmux \
-    ros-$ROS_DISTRO-gazebo-msgs 
+    tmux  
 # Check if the directory exists
 if [ ! -d "$ROOT_DIR" ]; then
     echo "Directory $ROOT_DIR does not exist. Creating..."
@@ -176,13 +181,27 @@ else
     pip install --no-cache-dir numpy==1.26.3 tensorflow==2.16.1
 fi
 
+pip install gdown
 # Deactivate the virtual environment
 deactivate
 
+# get the trained models
+# echo "Getting the latest models for ensemble..."
+# gdown --folder https://drive.google.com/drive/folders/1Pl-ZYWKN2yckLW5WBC7Ptt1AyxCEzFWR
+
+echo "Building workspaces..."
 # Set up workspaces
-setup_workspace "benchmarking_ws" "benchmarking_vision_based_grasping" "requirements.txt"
-#setup_workspace "panda_sim_ws" "panda_simulation" "requirements.txt"
 setup_workspace "grasp_algo_ws" "grasp_synthesis" "requirements.txt"
+
+# Install isaac sim ros
+source "$ROOT_DIR/venv/bin/activate"
+git clone https://github.com/isaac-sim/IsaacSim-ros_workspaces.git
+cd ./IsaacSim-ros_workspaces/humble_ws
+source /opt/ros/$ROS_DISTRO/setup.bash
+colcon build
+deactivate
+
+setup_workspace "benchmarking_ws" "benchmarking_vision_based_grasping" "requirements.txt"
 
 # Copy additional scripts
 cp "$SRC_DIR/benchmark_grasping_tmux.sh" "$ROOT_DIR/"

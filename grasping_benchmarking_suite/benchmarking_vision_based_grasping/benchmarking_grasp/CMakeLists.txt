@@ -18,7 +18,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(gazebo_msgs REQUIRED)
 # find_package(pcl_conversions REQUIRED)
-find_package(isaac_ros2_messages)
+find_package(isaac_ros2_messages REQUIRED)
 
 include_directories(
   include

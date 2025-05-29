@@ -30,7 +30,9 @@ from ament_index_python.packages import get_package_share_directory
 
 from grasp_interfaces.srv import Grasp2DPrediction, GraspPrediction
 from utils import *
-from pick_and_place import PickAndPlace
+from isaac_sim_ros2_adapter import IsaacSimROS2Adapter
+from isaac_sim_pick_and_place import IsaacPickAndPlace
+
 
 class BenchmarkTestStates(enum.Enum):
     """
@@ -75,18 +77,18 @@ class Benchmark(Node):
         self.gripper_width = self.get_parameter('gripper_width').value 
         self.gripper_height = self.get_parameter('gripper_height').value 
         self.gripper_offset = self.get_parameter('gripper_offset').value 
+        self.grasp_angle_offset = self.get_parameter('grasp_angle_offset').value
         self.intermediate_z_stop = self.get_parameter('intermediate_z_stop').value
         self.bad_grasp_z = self.get_parameter('bad_grasp_z').value
         self.enable_benchmark_test = self.get_parameter('enable_benchmark_test').value
-        self.benchmarking_velocity = self.get_parameter('benchmarking_velocity').value
+        self.benchmarking_velocity = self.get_parameter('robot_benchmarking_velocity').value
         self.robot_default_velocity = self.get_parameter('robot_default_velocity').value
         self.scan_pose = self.get_parameter('scan_pose').value
-        self.urdf_package_name = self.get_parameter('urdf_package_name').value
+        # self.urdf_package_name = self.get_parameter('urdf_package_name').value
         self.experiments_package_name = self.get_parameter('experiments_package_name').value
         self.experiments_config_relative_path = self.get_parameter('experiments_config_relative_path').value
         self.x_offset = self.get_parameter('x_offset_world').value
         self.y_offset = self.get_parameter('y_offset_world').value
-
 
 
         self.lock = Lock()
@@ -107,18 +109,6 @@ class Benchmark(Node):
                 self.grasp_in_image_frame_service,
                 callback_group=self.reentrant_callback_group
             )
-        # NOT TESTED
-        self.spawn_model_client = self.create_client(
-            SpawnModel,
-            '/gazebo/spawn_sdf_model',
-            callback_group=self.reentrant_callback_group
-        )
-        # NOT TESTED
-        self.delete_model_client = self.create_client(
-            DeleteModel,
-            '/gazebo/delete_model',
-            callback_group=self.reentrant_callback_group
-        )
 
         # Initialise topics
         self.rgb_img_sub = self.create_subscription(
@@ -145,13 +135,6 @@ class Benchmark(Node):
             self._joint_states_cb, 1,
             callback_group=self.reentrant_callback_group
         )
-        # ALTERNATIVE to GazeboGraspEvent??
-        # self.grasp_sub = self.create_subscription(
-        #     GazeboGraspEvent,
-        #     '/gazebo_grasp_plugin_event_republisher/grasp_events',
-        #     self._on_grasp_event, 1,
-        #     callback_group=self.reentrant_callback_group
-        # )
 
         self.img_vis_pub = self.create_publisher(
             Image,
@@ -170,11 +153,22 @@ class Benchmark(Node):
         self.cam_K = 0    
 
         self.depth_scale = 1   
-        self.pick_and_place = PickAndPlace(self, 
+        self.isaac_sim_adapter = IsaacSimROS2Adapter(self)
+        self.pick_and_place = IsaacPickAndPlace(self, 
                                            gripper_offset=self.gripper_offset,
-                                           intermediate_z_stop=self.intermediate_z_stop)
+                                           intermediate_z_stop=self.intermediate_z_stop,
+                                           sim_adapter=self.isaac_sim_adapter)
         
-        self.urdf_path = os.path.join(get_package_share_directory(self.urdf_package_name), "urdf/objects")
+
+        # if not self.over_head:
+        self.pick_and_place.setScanPose(x=self.scan_pose [0], y=self.scan_pose [1], z=self.scan_pose [2], 
+                                        roll=self.scan_pose [3], pitch=self.scan_pose [4], yaw=self.scan_pose [5])
+        if self.use_cartesian:
+            self.pick_and_place.reach_cartesian_scanpose()
+        else:
+            self.pick_and_place.reach_scanpose()
+
+
         self.experiments_config_path = os.path.join(get_package_share_directory(self.experiments_package_name), self.experiments_config_relative_path)
         PACKAGE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
         self.RESULTS_DIR = os.path.join(PACKAGE_ROOT, "src/benchmarking_vision_based_grasping/benchmarking_grasp/results")
@@ -186,10 +180,9 @@ class Benchmark(Node):
             writer = csv.writer(file)
             writer.writerow(header)
 
-        # Parse object list and benchmarking parameters from the experiments config file
-        parsed_experiments = parse_experiments_config(self.experiments_config_path, self.urdf_path)
-        # Generate object list and benchmarking parameters for spawning objects
+        parsed_experiments = parse_experiments_config(self.experiments_config_path)
         self.experiments = generate_experiments(parsed_experiments)
+
 
         # Variables to track 
         self.experiment_idx = 0
@@ -198,7 +191,7 @@ class Benchmark(Node):
         self.n_ = 0
         self.testing_in_process = False
         self.benchmark_state = BenchmarkTestStates.FREE
-        self.attached = False
+        self.attached = True
         self.positive_grasps = []
         self.negative_grasps = []
         self.finger1_state = 0.05
@@ -212,7 +205,7 @@ class Benchmark(Node):
         img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='rgb8')
         with self.lock:
             self.current_rgb_image = img
-
+            
     def _depth_img_callback(self, msg:Image):
         img = self.bridge.imgmsg_to_cv2(msg)
         with self.lock:
@@ -234,28 +227,28 @@ class Benchmark(Node):
             self.finger2_state = position[1]
 
     # NOT TESTED
-    def _on_grasp_event(self, msg):
-        """
-        If a grasp is detected by the grasp plugin
-        Do stuff
-        """
-        object = msg.object
-        attached = msg.attached
+    # def _on_grasp_event(self, msg):
+    #     """
+    #     If a grasp is detected by the grasp plugin
+    #     Do stuff
+    #     """
+    #     object = msg.object
+    #     attached = msg.attached
 
-        if attached:
-            with self.lock:
-                self.pick_and_place.call_gripper_service(self.finger1_state)
+    #     if attached:
+    #         with self.lock:
+    #             self.pick_and_place.call_gripper_service(self.finger1_state)
                         
-        if attached and self.testing_in_process:
-            self.attached = True
+    #     if attached and self.testing_in_process:
+    #         self.attached = True
         
-        if not attached and self.testing_in_process:
-            self.negative_grasps.append(object)
-            self.attached = False
+    #     if not attached and self.testing_in_process:
+    #         self.negative_grasps.append(object)
+    #         self.attached = False
         
-        if not attached and not self.testing_in_process and self.attached:
-            self.positive_grasps.append(object)
-            self.attached = False
+    #     if not attached and not self.testing_in_process and self.attached:
+    #         self.positive_grasps.append(object)
+    #         self.attached = False
 
     def on_shutdown(self):
         self.get_logger().info(f"\033[92m Average inference time: {self.avg_inference_time} secs\033[0m")
@@ -265,13 +258,22 @@ class Benchmark(Node):
 
         rgb_img = None
         depth_img = None
-        with self.lock:
-            while self.current_depth_image is None or self.current_rgb_image is None:
-                self.get_logger().warning('Waiting for rgb/depth image')
-                time.sleep(0.1) # Since the callback groups are reentrant, this should not hold up the thread 
-            
-            rgb_img = self.current_rgb_image.copy()
-            depth_img = self.current_depth_image.copy()
+
+        self.get_logger().info('Attempting to get a fresh pair of RGB and Depth images...')
+        # Loop until both new images are available
+        while True:
+            with self.lock: # Acquire lock to check/copy image data
+                # Check if new images have arrived since they were last consumed
+                if self.current_rgb_image is not None and self.current_depth_image is not None:
+                    rgb_img = self.current_rgb_image.copy()
+                    depth_img = self.current_depth_image.copy()
+
+                    self.current_rgb_image = None
+                    self.current_depth_image = None
+                    
+                    self.get_logger().info('Fresh RGB and Depth images acquired.')
+                    break 
+            time.sleep(0.05)
 
 
         grasp_request.rgb_image = self.bridge.cv2_to_imgmsg(rgb_img, encoding='rgb8')
@@ -283,13 +285,20 @@ class Benchmark(Node):
 
         future = self.grasp_client.call_async(grasp_request)
         self.get_logger().info('Waiting for the service to return')
-        rclpy.spin_until_future_complete(self, future=future)
+        #rclpy.spin_until_future_complete(self, future=future)
+        completed_future = self._wait_for_future(future, timeout_sec=10.0)
         
-        result = future.result()
-        if result is None:
+        if completed_future is not None:
+            result = future.result()
+            if result is None:
+                self.get_logger().warning("Grasp Service failed to return a valid result")
+                return None, None
+        else:
             self.get_logger().warning("Grasp Service failed to return a valid result")
-            return None, None
-        
+        # result.best_grasp.angle = 3.14-0.717
+        # result.best_grasp.width = 80.0
+        # result.best_grasp.px = 238
+        # result.best_grasp.py = 425
         return result, rgb_img, depth_img
     
     def start_complete_benchmarking(self):
@@ -303,75 +312,75 @@ class Benchmark(Node):
         6. Updates the score log file (Only useful for simulator)
         7. Deletes the object from environment (Only useful for simulator)
         """
-        skip = False
-        experiment = self.experiments[self.experiment_idx]
-        object = experiment[0][self.object_idx]
-        pose = experiment[1][self.pose_idx]
-        # rospy.set_param("current_recording", str(object.split("/")[-1].split(".")[0]) + "_" + str(self.pose_idx))
+        while self.experiment_idx < len(self.experiments):
+            skip = False
+            experiment = self.experiments[self.experiment_idx]
+            object = experiment[0][self.object_idx]
+            pose = experiment[1][self.pose_idx]
+            # rospy.set_param("current_recording", str(object.split("/")[-1].split(".")[0]) + "_" + str(self.pose_idx))
 
-        if self.sim_mode:
-            self.spawn_model(object, pose)
-            self.get_logger().info("Spawning {} at pose {}".format(str(object.split("/")[-1].split(".")[0]), self.pose_idx))
-            time.sleep(2)
-        else:
-            try:
-                input("\033[92mPlace {} at pose {} and press 'enter'".format(str(object.split("/")[-1].split(".")[0]), self.pose_idx)+"\033[0m")
-            except SyntaxError:
-                pass
-
-        # Execute the benchmark test
-        self.testing_in_process = True
-        # rospy.set_param("start_recording", True)
-        
-        try:
-            success = self.execute_pickup()
-            if self.enable_benchmark_test:
-                self.execute_benchmarking_maneuvers()
-            score = self.benchmark_state
-            if success:
-                self.execute_place()
-        except Exception as e:
-            self.get_logger().error(f"Skipping this turn {e}")
-            skip = True
-
-        self.testing_in_process = False
-
-        if self.use_cartesian:
-            self.pick_and_place.reach_cartesian_scanpose()
-        else:
-            self.pick_and_place.reach_scanpose()
-
-        if self.sim_mode:
-            try:
+            if self.sim_mode:
+                self.spawn_model(object, pose)
+                self.get_logger().info("Spawning {} at pose {}".format(str(object.split("/")[-1].split(".")[0]), self.pose_idx))
                 time.sleep(1)
-                self.delete_model(object)
-                time.sleep(2)
+            else:
+                try:
+                    input("\033[92mPlace {} at pose {} and press 'enter'".format(str(object.split("/")[-1].split(".")[0]), self.pose_idx)+"\033[0m")
+                except SyntaxError:
+                    pass
+
+            # Execute the benchmark test
+            self.testing_in_process = True
+            # rospy.set_param("start_recording", True)
+            self.get_logger().info("Starting pickup")
+            try:
+                success = self.execute_pickup()
+                if self.enable_benchmark_test and success:
+                    self.execute_benchmarking_maneuvers()
+                score = self.benchmark_state
+                if success:
+                    self.execute_place()
             except Exception as e:
-                self.get_logger().error(f"Object deleted while still attached to hand {e}")
+                self.get_logger().error(f"Skipping this turn {e}")
+                skip = True
 
-        if not skip:
-            with open(self.log_file_path, 'a') as file:
-                update = [str(self.experiment_idx), str(self.n_), str(object.split("/")[-1].split(".")[0]), str(self.pose_idx), score.value, str(self.inference_time)]
-                writer = csv.writer(file)
-                writer.writerow(update)
+            self.testing_in_process = False
 
-            # Track the status of the test
-            self.pose_idx = self.pose_idx + 1 
-            if self.pose_idx >= len(experiment[1]):
-                self.pose_idx = 0
-                self.n_ = self.n_ + 1
-                if self.n_ >= experiment[2]:
-                    self.n_ = 0
-                    self.object_idx = self.object_idx + 1
-                    if self.object_idx >= len(experiment[0]):
-                        self.object_idx = 0
-                        self.experiment_idx = self.experiment_idx + 1
-                        # rospy.loginfo("[Benchmarking Pipeline] Success rate for experiment %s: %s", self.experiment_idx, len(self.positive_grasps)/(len(self.positive_grasps) + len(self.negative_grasps)))
-                        if self.experiment_idx >= len(self.experiments):
-                            self.get_logger().info("Benchmarking test completed successfully")
-                            self.destroy_node()
+            if self.use_cartesian:
+                self.pick_and_place.reach_cartesian_scanpose()
+            else:
+                self.pick_and_place.reach_scanpose()
+
+            if self.sim_mode:
+                try:
+                    # time.sleep(1)
+                    self.delete_model(object)
+                    # time.sleep(2)
+                except Exception as e:
+                    self.get_logger().error(f"Object deleted while still attached to hand {e}")
+
+            if not skip:
+                with open(self.RESULTS_FILE, 'a') as file:
+                    update = [str(self.experiment_idx), str(self.n_), str(object.split("/")[-1].split(".")[0]), str(self.pose_idx), score.value, str(self.inference_time)]
+                    writer = csv.writer(file)
+                    writer.writerow(update)
+
+                # Track the status of the test
+                self.pose_idx = self.pose_idx + 1 
+                if self.pose_idx >= len(experiment[1]):
+                    self.pose_idx = 0
+                    self.n_ = self.n_ + 1
+                    if self.n_ >= experiment[2]:
+                        self.n_ = 0
+                        self.object_idx = self.object_idx + 1
+                        if self.object_idx >= len(experiment[0]):
+                            self.object_idx = 0
+                            self.experiment_idx = self.experiment_idx + 1
+                            # rospy.loginfo("[Benchmarking Pipeline] Success rate for experiment %s: %s", self.experiment_idx, len(self.positive_grasps)/(len(self.positive_grasps) + len(self.negative_grasps)))
+                            if self.experiment_idx >= len(self.experiments):
+                                self.get_logger().info("Benchmarking test completed successfully")
+                                self.destroy_node()
         
-        # rospy.set_param("start_recording", False)
 
     # NOT TESTED
     def execute_pickup(self):
@@ -385,19 +394,24 @@ class Benchmark(Node):
         grasp_in_world_frame = None
         if self.grasp_in_image_frame_service != '/top_surface_grasp_service/predict':
             grasp_in_img_frame, rgb_img, depth_img = self.get_grasp_in_img_frame()
+            self.get_logger().info("Received grasp in image frame")
             grasp_in_cam_frame = self.grasp_img2cam(grasp_in_img_frame, rgb_img, depth_img)
+            self.get_logger().info("Received grasp in camera frame")
             grasp_in_world_frame:GraspPrediction.Response = self.grasp_cam2world(grasp_in_cam_frame)
         else:
             grasp_request = GraspPrediction.Request()  # This is correct since the request has no fields
             future = self.grasp_client_pointcloud.call_async(grasp_request)
             self.get_logger().info("Waiting for top surface service to return")
-            rclpy.spin_until_future_complete(self, future)
-            if future.done():
+            #rclpy.spin_until_future_complete(self, future)
+            #rclpy.spin_until_future_complete(self, future=future)
+            completed_future = self._wait_for_future(future, timeout_sec=10.0)
+            
+            if completed_future is None:
+                self.get_logger().error(f'Service call failed with {e}')
+            else:
                 try:
-                    result = future.result()
-                    grasp_in_cam_frame = result
+                    grasp_in_cam_frame = completed_future.result()              
                     self.get_logger().info('Grasp service returned successfully')
-                    # Process result here
                 except Exception as e:
                     self.get_logger().error(f'Service call failed with {e}')
 
@@ -406,9 +420,8 @@ class Benchmark(Node):
         
         end_time = self.get_clock().now()
     
-
         # Calculate average inference time
-        self.inference_time = (end_time - start_time).nanoseconds/10e-9
+        self.inference_time = (end_time - start_time).nanoseconds/10e9
         total_objects = len(self.experiments[self.experiment_idx][0])
         total_poses = len(self.experiments[self.experiment_idx][1])
         total_samples = self.n_*total_objects*total_poses + self.object_idx*total_poses + self.pose_idx + 1
@@ -432,15 +445,16 @@ class Benchmark(Node):
                 self.pick_and_place.execute_cartesian_pick_up()
             else:
                 self.pick_and_place.execute_pick_up()
-            if self.attached:
+            if self.is_attached():
                 self.benchmark_state = BenchmarkTestStates.PICK_UP
+            else: 
+                return False
         else:
             self.get_logger().warning("Bad grasp received, skipping this turn")
             return False
 
         return True
     
-    # NOT TESTED
     def execute_place(self):
         """
         1. Places the object 
@@ -462,51 +476,37 @@ class Benchmark(Node):
             1. Roll pitch yaw rotation
             2. Shake test
         """
-        self.pick_and_place.call_set_joint_velocity_service(self.benchmarking_velocity)
+        # self.pick_and_place.call_set_joint_velocity_service(self.robot_benchmarking_velocity)
 
-        # Rotate the object
-        pose = self.pick_and_place.call_get_current_pose_service()
-        (x, y, z) = (pose.position.x, pose.position.y, pose.position.z) 
-        (roll, pitch, yaw) = euler_from_quaternion((pose.orientation.x, pose.orientation.y, 
-                                                                       pose.orientation.z, pose.orientation.w))
+        # # Rotate the object
+        # pose = self.pick_and_place.call_get_current_pose_service()
+        # (x, y, z) = (pose.position.x, pose.position.y, pose.position.z) 
+        # (roll, pitch, yaw) = euler_from_quaternion((pose.orientation.x, pose.orientation.y, 
+        #                                                                pose.orientation.z, pose.orientation.w))
         
-        # Yawing    
+        # Yawing (relative positions)
         self.pick_and_place.call_move_joint_service(6, np.pi/4)
         self.pick_and_place.call_move_joint_service(6, -np.pi/2)
         self.pick_and_place.call_move_joint_service(6, np.pi/4)
 
-        if self.attached:
+        if self.is_attached():
             self.benchmark_state = BenchmarkTestStates.ROTATE
-
-        # Rolling
-        self.pick_and_place.call_move_joint_service(4, np.pi/8)
-        self.pick_and_place.call_move_joint_service(4, -np.pi/4)
+        else: 
+            self.get_logger().warn("Object not attached to gripper, aborting further tests!")
+            return
+            
+        # Rolling - for shaking (relative positions)
         self.pick_and_place.call_move_joint_service(4, np.pi/4)
-        self.pick_and_place.call_move_joint_service(4, -np.pi/4)
-        self.pick_and_place.call_move_joint_service(4, np.pi/8)
+        self.pick_and_place.call_move_joint_service(4, -np.pi/2)
+        #self.pick_and_place.call_move_joint_service(4, np.pi/2)
+        #self.pick_and_place.call_move_joint_service(4, -np.pi/2)
+        self.pick_and_place.call_move_joint_service(4, np.pi/4)
 
-        if self.attached:
+        if self.is_attached():
             self.benchmark_state = BenchmarkTestStates.SHAKE
-
-        self.pick_and_place.call_set_joint_velocity_service(self.robot_default_velocity)
-    
-    
-    # def test_execute_benchmarking(self):
-    #     self.get_logger().info("Executing benchmark")
-    #     if not self.over_head:
-    #         self.pick_and_place.setScanPose(x=self.scan_pose[0], y=self.scan_pose[1], z=self.scan_pose[2], 
-    #                                         roll=self.scan_pose[3], pitch=self.scan_pose[4], yaw=self.scan_pose[5])
-    #         if self.use_cartesian:
-    #             self.pick_and_place.reach_cartesian_scanpose()
-    #         else:
-    #             self.pick_and_place.reach_scanpose()
-                
-    #     for i in range(10):
-    #         time.sleep(5)
-    #         grasp_in_img_frame, rgb_img, depth_img = self.get_grasp_in_img_frame()
-    #         grasp_in_cam_frame = self.grasp_img2cam(grasp_in_img_frame, rgb_img, depth_img)
-    #         grasp_in_world_frame = self.grasp_cam2world(grasp_in_cam_frame)
-    #         # self.get_logger().info(self.get_grasp_in_img_frame())
+        else: 
+            self.get_logger().warn("Object not attached to gripper, aborting further tests!")
+            return           
 
 
     def grasp_img2cam(self, grasp_in_img_frame:Grasp2DPrediction.Response, rgb_img, depth_img):
@@ -514,11 +514,15 @@ class Benchmark(Node):
         precrop_center = center.copy() 
         angle = grasp_in_img_frame.best_grasp.angle
 
+        # self.get_logger().info(str(grasp_in_img_frame.best_grasp.px))
+        # self.get_logger().info(str(grasp_in_img_frame.best_grasp.py))
+        # self.get_logger().info(str(grasp_in_img_frame.best_grasp.angle))
+        # self.get_logger().info(str(grasp_in_img_frame.best_grasp.width))
+
         angle_vec_in_cam = np.linalg.inv(self.cam_K)@np.array([[np.cos(angle)], [np.sin(angle)], [1]])
         origin_vec_in_cam = np.linalg.inv(self.cam_K)@np.array([[0], [0], [1]])
         angle_in_cam = np.arctan2(angle_vec_in_cam[1, 0] - origin_vec_in_cam[1, 0], angle_vec_in_cam[0, 0] - origin_vec_in_cam[0, 0])
         self.angle_2d_in_cam_frame = angle_in_cam
-
         (position, angle_in_cam, gripper_width) = calculate_camera_frame_transform(
             center=center,
             precrop_center=precrop_center,
@@ -528,8 +532,9 @@ class Benchmark(Node):
             depth_scale=self.depth_scale,
             angle_2d_flag=self.angle_2d_in_cam_frame,
             gripper_width=self.gripper_width,
-            gripper_height=self.gripper_height
+            gripper_height=self.gripper_height, node=self
         )
+        angle_in_cam = angle_in_cam + self.grasp_angle_offset
 
         result = GraspPrediction.Response()
         result.success = True
@@ -553,13 +558,10 @@ class Benchmark(Node):
         return result
     
     # NOT TESTED
-    def spawn_model(self, model_path, pose):
+    def spawn_model(self, object_name, pose):
         """
         Spawns model in the required pose in Gazebo
         """
-        if not self.spawn_model_client.service_is_ready():
-            self.get_logger().warn('Spawn model service is not available')
-            return False
         
         spawn_pose = Pose()
         spawn_pose.position.x = pose[0]
@@ -572,35 +574,25 @@ class Benchmark(Node):
         spawn_pose.orientation.z = quaternion[2]
         spawn_pose.orientation.w = quaternion[3]
 
-        file_xml = open(model_path, 'r')
-        model_xml = file_xml.read()
-        
-        request = SpawnModel.Request()
-        request.initial_pose = spawn_pose
-        request.model_xml = model_xml
-        request.model_name = model_path.split("/")[-1].split(".")[0]
-        request.reference_frame = 'world'
-        request.robot_namespace = ''
-        
-        future = self.spawn_model_client.call_async(request)
-        rclpy.spin_until_future_complete(future)
-        result:SpawnModel.Response = future.result()
-        return result.success
+        success = self.isaac_sim_adapter.spawn_model(object_name, spawn_pose)
+
+        return success
     
     # NOT TESTED
-    def delete_model(self, model_path):
+    def delete_model(self, object_name):
         """
         Deletes the model from the Gazebo environment
         """        
-        if not self.delete_model_client.service_is_ready():
-            self.get_logger().warn('Delete model service is not available')
-            return False
-        request = DeleteModel.Request()
-        request.model_name = model_path.split("/")[-1].split(".")[0]
-        future = self.delete_model_client.call_async(request)
-        rclpy.spin_until_future_complete(future)
-        result:DeleteModel.Response = future.result()
-        return result.success
+        # if not self.delete_model_client.service_is_ready():
+        #     self.get_logger().warn('Delete model service is not available')
+        #     return False
+        # request = DeleteModel.Request()
+        # request.model_name = model_path.split("/")[-1].split(".")[0]
+        # future = self.delete_model_client.call_async(request)
+        # rclpy.spin_until_future_complete(future)
+        # result:DeleteModel.Response = future.result()
+        success = self.isaac_sim_adapter.delete_model(object_name)
+        return success
     
     def grasp_cam2world(self, grasp_in_cam_frame:GraspPrediction.Response):
         result = GraspPrediction.Response()
@@ -656,10 +648,44 @@ class Benchmark(Node):
             return None
 
         return transformed_pose.pose
+    
+    def is_attached(self):
+        if self.sim_mode:
+            self.attached = self.isaac_sim_adapter.attached
+        return self.attached
+    
+    def _wait_for_future(self, future: rclpy.task.Future, timeout_sec: float = 10.0):
+        """
+        Passively waits for a future to complete, allowing the main executor to process it.
+        """
+        # self.get_logger().debug(f"Waiting for future {future}...")
+        start_time = self.get_clock().now()
+        while rclpy.ok() and not future.done():
+            if (self.get_clock().now() - start_time) > Duration(seconds=timeout_sec):
+                self.get_logger().error(f"Timeout waiting for future {future} after {timeout_sec} seconds.")
+                # You might want to try to cancel the future here if possible,
+                # though cancellation is not always supported or effective.
+                # if future.cancel():
+                #    self.get_logger().info(f"Future {future} was cancelled.")
+                # else:
+                #    self.get_logger().info(f"Future {future} could not be cancelled.")
+                return None # Indicate timeout
 
+            # Sleep briefly to yield control to other threads, especially the main rclpy.spin()
+            time.sleep(0.01) # Small sleep to be responsive
+
+        if future.done():
+            try:
+                return future.result()
+            except Exception as e:
+                self.get_logger().error(f'Future {future} completed with an exception: {e}')
+                return None 
+
+        return None 
 
 
 def run_benchmark_in_thread(benchmark_node:Benchmark):
+    # return
     benchmark_node.start_complete_benchmarking()
 
 def main(args=None):

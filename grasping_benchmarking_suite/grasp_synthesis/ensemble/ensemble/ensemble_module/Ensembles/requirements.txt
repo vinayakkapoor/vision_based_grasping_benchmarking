@@ -1,0 +1,38 @@
+pyyaml
+certifi
+charset-normalizer
+cycler
+fonttools
+idna
+imageio
+kiwisolver
+matplotlib
+networkx
+pandas
+numpy
+opencv-python
+packaging
+Pillow
+pyparsing
+python-dateutil
+PyWavelets
+requests
+scikit-image
+scipy
+six
+tifffile
+imagecodecs
+# for the tunning
+ray[tune] 
+optuna
+fsspec
+scikit-learn
+# itertools
+-f https://download.pytorch.org/whl/torch_stable.html
+torch==2.0.0+cu117
+torchvision==0.15.1+cu117
+torchaudio==2.0.1 
+torchsummary
+tensorboardX
+typing-extensions
+urllib3

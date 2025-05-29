@@ -1,3 +1,7 @@
 **/logs/
 **/recordings
 **__pycache__/
+**/.vscode/
+**/results/
+**/weights/
+**/trained_models

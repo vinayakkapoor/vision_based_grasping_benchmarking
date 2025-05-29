@@ -1,7 +1,9 @@
 catkin_pkg
 cython
+easydict
 empy==3.3.2
 lark
 opencv-python
 pyyaml
 transforms3d
+roboticstoolbox-python

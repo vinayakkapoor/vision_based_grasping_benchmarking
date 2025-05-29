@@ -6,57 +6,75 @@ import yaml
 import os
 
 def generate_experiments(parsed_experiments):
+    """
+    Generates experiment configurations with object names and calculated poses.
+    """
     experiments = []
-    
-    for experiment_idx, experiment in enumerate(parsed_experiments):
+
+    for experiment_idx, experiment_data in enumerate(parsed_experiments):
         # print(f"Processing experiment {experiment_idx}")
 
-        model_paths = experiment[0] 
-        center = experiment[1]
-        r = experiment[2]
-        alpha = experiment[3]
-        n = experiment[4]
-        height = experiment[5]
+        # This will now be the list of object names directly
+        object_names = experiment_data[0]
+        center = experiment_data[1]
+        r = experiment_data[2]
+        alpha = experiment_data[3]
+        n = experiment_data[4]
+        height = experiment_data[5]
 
         center_coord = np.array([center, 0, height, 0, 0, 0])
 
-        # Generate object poses for spawning
-        poses = [
-            center_coord, 
+        # Generate object poses for spawning (relative to center)
+        poses = [            
+            center_coord,
             center_coord + np.array([r, 0, 0, 0, 0, 0]),
             center_coord + np.array([0, r, 0, 0, 0, 0]),
-            center_coord + np.array([0, -r, 0, 0, 0, 0]),
-            center_coord + np.array([0, r, 0, 0, 0, alpha]),
-            center_coord + np.array([0, -r, 0, 0, 0, -alpha])
+            center_coord + np.array([0, -r, 0, 0, 0, 0]),  
+            center_coord + np.array([0, r, 0, 0, 0, alpha]),             
+            center_coord + np.array([0, -r, 0, 0, 0, -alpha]),         
         ]
 
-        experiments.append([model_paths, poses, n])
+        # Append the list of object names, the calculated poses, and n
+        experiments.append([object_names, poses, n])
 
     return experiments
 
-def parse_experiments_config(experiments_config_path, urdf_path):
+def parse_experiments_config(experiments_config_path): 
     """
-    Parse information from the yaml file
+    Parse information from the yaml file, keeping only object names.
     """
+    print("Parsing")
     model_file = open(experiments_config_path, 'r')
     config = yaml.load(model_file, Loader=yaml.FullLoader)
+    model_file.close() 
 
-    if config['only_first']:
+    if config.get('only_first', False): 
         experiments_n = 1
     else:
-        experiments_n = len(config) - 1
+        # Calculate number of experiments based on keys like 'experiment_X'
+        experiment_keys = [k for k in config.keys() if k.startswith('experiment_')]
+        experiments_n = len(experiment_keys)
 
     experiments = []
     for experiment_idx in range(1, experiments_n + 1):
-        models = config["experiment_" + str(experiment_idx)]["objects"]
-        model_paths = [os.path.join(urdf_path, model, model[4:] + ".sdf") for model in models]
+        experiment_key = f"experiment_{experiment_idx}"
+        if experiment_key not in config:
+            print(f"Warning: Configuration for {experiment_key} not found. Skipping.")
+            continue
 
-        center = config["experiment_" + str(experiment_idx)]["config"]["center"]            
-        r = config["experiment_" + str(experiment_idx)]["config"]["r"]
-        alpha = config["experiment_" + str(experiment_idx)]["config"]["alpha"]
-        n = config["experiment_" + str(experiment_idx)]["config"]["n"]
-        height = config["experiment_" + str(experiment_idx)]["config"]["height"]
-        experiments.append([model_paths, center, r, alpha, n, height])
+        object_names = config[experiment_key]["objects"]
+
+        # Get config parameters
+        exp_config = config[experiment_key].get("config", {}) # Use .get for safer access
+        center = exp_config.get("center", 0.0) # Provide defaults if needed
+        r = exp_config.get("r", 0.0)
+        alpha = exp_config.get("alpha", 0.0)
+        n = exp_config.get("n", 1)
+        height = exp_config.get("height", 0.0)
+
+        # Append the list of object names and config parameters
+        experiments.append([object_names, center, r, alpha, n, height])
+
     return experiments
 
 def init_params(node:Node):
@@ -91,8 +109,8 @@ def init_params(node:Node):
 
             # Robot control params
             ('robot_default_velocity', 0.1),
-            ('robot_approach_velocity', 0.05),
-            ('benchmarking_velocity', 0.5),
+            ('robot_approach_velocity', 0.5),
+            ('robot_benchmarking_velocity', 0.5),
 
             # Miscellaneous params
             ('record_video', True),
@@ -133,7 +151,7 @@ def init_params(node:Node):
     )
 
 def calculate_camera_frame_transform(center, precrop_center, angle, depth_image, cam_K, 
-                                    depth_scale, angle_2d_flag, gripper_width, gripper_height):
+                                    depth_scale, angle_2d_flag, gripper_width, gripper_height, node):
     """
     Calculates 3D grasp pose in camera frame from 2D image coordinates
     
@@ -177,10 +195,11 @@ def calculate_camera_frame_transform(center, precrop_center, angle, depth_image,
         )
     else:
         angle_in_cam = angle
-
+    
+    node.get_logger().info(str([precrop_center[1], precrop_center[0]]))
     # Calculate gripper width in pixels
     width_px = get_gripper_width_cam2img(
-        cam_K,z,depth_image[precrop_center[1], precrop_center[0]] * depth_scale
+        cam_K,z,depth_image[precrop_center[0], precrop_center[1]] * depth_scale, node=node
     )
 
     return (
@@ -257,17 +276,19 @@ def get_pixels_around_point(image_shape, center, radius):
     mask = (distances <= radius)
     return np.column_stack((y_coords[mask], x_coords[mask]))
 
-def get_gripper_width_cam2img(K, z, gripper_width_cam):
+def get_gripper_width_cam2img(K, z, gripper_width_cam, node=None):
     """
     :param gripper_width: Real Gripper_width in cam frame
     :param K: Camera matrix
     :param z: z of the detected grasp
     Takes the width of the gripper in camera frame and finds the width of the gripper in the image frame 
     """
+    
     width_in_img_frame = K @ np.array([[gripper_width_cam], [0], [z]])
     orig_img_frame = K @np.array([[0], [0], [z]])
 
     width = abs((width_in_img_frame/width_in_img_frame[2, 0] - orig_img_frame/orig_img_frame[2, 0])[0, 0])
+
     return width
 
 def find_depth_from_gripper_profile(depth_image, x, y, angle, depth_scale, K, gripper_width_cam, gripper_height):

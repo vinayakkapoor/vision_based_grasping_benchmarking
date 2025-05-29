@@ -2,34 +2,38 @@ only_first: True
 
 experiment_1:
   objects:
-    - 056_tennis_ball
-    - 044_flat_screwdriver
-    - 050_medium_clamp
-    - 051_large_clamp
-    - 052_extra_large_clamp
-    - 011_banana
-    - 012_strawberry
-    - 016_pear
-    - 025_mug
-    - 006_mustard_bottle
+    - screwdriver
+    - strawberry
+    - pear
+    - medium_clamp
+    - extra_large_clamp
+    - large_clamp
+    - mustard_bottle
+    - tennis_ball
+    - banana
+    - mug
   config:
-    center: 0.45
-    r: 0.1
-    alpha: 1.57
+    center: 0.35
+    r: 0.2
+    alpha: 0.785
     n: 1
-    height: 0.51
+    height: 0.2
 
-experiment_2:
-  objects:
-    - 057_racquetball
-    - 065-j_cups
-    - 021_bleach_cleanser
-    - 044_flat_screwdriver
-    - 050_medium_clamp
-    - 072-a_toy_airplane
-  config:
-    center: 0.4
-    r: 0.25
-    alpha: 0.78
-    n: 1
-    height: 0.5
+# experiment_2:
+#   objects:
+#     - screwdriver
+#     - strawberry
+#     - pear
+#     - medium_clamp
+#     - extra_large_clamp
+#     - large_clamp
+#     - mustard_bottle
+#     - tennis_ball
+#     - banana
+#     - mug
+#   config:
+#     center: 0.35
+#     r: 0.2
+#     alpha: 0.785
+#     n: 1
+#     height: 0.2
