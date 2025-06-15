@@ -49,7 +49,7 @@ setup_workspace() {
         cd gpd
         mkdir -p build && cd build
         cmake ..
-        make -j6
+        make -j15
         sudo make install
         cd ../../../
     fi
@@ -73,7 +73,7 @@ setup_workspace() {
     catkin config --extend /opt/ros/noetic \
                   --cmake-args -DPYTHON_EXECUTABLE="$ROOT_DIR/venv/bin/python3"
     
-    catkin build -j6  # Build the workspace
+    catkin build -j15  # Build the workspace
     deactivate  # Deactivate virtual environment
     cd "$ROOT_DIR"  # Return to the root directory
 }
