@@ -42,7 +42,19 @@ setup_workspace() {
     mkdir -p "$ROOT_DIR/$workspace_name/src"
     cd "$ROOT_DIR/$workspace_name/src"
     cp -r "$SRC_DIR/$package_name" ./
-    
+    pwd
+    # Build GPD
+    if [ "$package_name" == "grasp_synthesis" ]; then
+        cd grasp_synthesis
+        cd gpd
+        mkdir -p build && cd build
+        cmake ..
+        make -j6
+        sudo make install
+        cd ../../../
+    fi
+    pwd
+
     # Activate virtual environment
     source "$ROOT_DIR/venv/bin/activate"  # Activate virtual environment
 
