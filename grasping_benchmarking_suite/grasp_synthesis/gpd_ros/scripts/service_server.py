@@ -53,6 +53,8 @@ class GraspService:
 
         response.best_grasp.pose = pose
 
+        self.curr_graps_config_list = None
+
         return response
 
 if __name__ == '__main__':
