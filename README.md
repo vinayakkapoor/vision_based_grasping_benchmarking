@@ -11,6 +11,19 @@ This is the official repository for **A Benchmarking Study of Vision-based Robot
     <img src="https://img.youtube.com/vi/hmgh5JGP-Ak/0.jpg" alt="Video Demo" width="800" height="500">
 -->
 
+***
+This branch adds the following features to help extend this benchmarking framework to cluttered environments and 6-DOF grasping algorithms - 
+
+ - **The initial approach pose of the camera can be updated** so that it goes to the required position instead of the same top-down location everytime. This should help extend the functionalities for active vision
+ ```
+rostopic pub /set_approach_pose geometry_msgs/Pose "{position: {x: 1.0, y: 0.0, z: 0.8}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}"
+```
+ - **Grasping is a cyclic routing**. It is attempted until `is_table_clear()` (in *benchmarking_pipeline.py*) returns True. This ensures support for cluttered grasping environment.
+ - [GPD](https://github.com/atenpas/gpd), a popular **6-DOF grasping algorithm** is implemented for reference.
+
+![Static Image](media/gpd.png)
+***
+
 ## General Setup
 
 <details>
@@ -258,6 +271,7 @@ catkin build -j6
 3. **Problems with GUI when using docker**
 
     This [stackoverflow thread](https://stackoverflow.com/questions/40658095/how-to-open-ubuntu-gui-inside-a-docker-image) was incredibly helpful for troubleshooting
+4. The gpd node sometime dies / does not correctly trigger grasp generation. Relaunching gpd_ros fixes it. Please refer to this issue for more info - https://github.com/atenpas/gpd_ros/issues/12
 
 
 
