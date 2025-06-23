@@ -168,6 +168,7 @@ class ImageToCameraFrame:
         if self.grasp_in_image_frame_topic == 'gpd_grasp_service/predict':
             rospy.loginfo("[Grasp Transform] Using Pointcloud as input")
             rospy.wait_for_service(self.grasp_in_image_frame_topic, timeout=30)
+            rospy.loginfo("[Grasp Transform] GPD service detected")
             
             srv_handle = rospy.ServiceProxy(self.grasp_in_image_frame_topic, GraspPrediction)            
             response = srv_handle()

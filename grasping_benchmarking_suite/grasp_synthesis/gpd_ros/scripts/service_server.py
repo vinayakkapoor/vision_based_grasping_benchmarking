@@ -15,14 +15,6 @@ class GraspService:
         self.gpd_pub = rospy.Publisher('/cloud_stitched', CloudSamples, queue_size=1)
         self.pcl_sub = rospy.Subscriber('/camera/depth/color/roi_points', PointCloud2, self.pcl_cb)
         self.grasp_config_list_sub = rospy.Subscriber('/detect_grasps/clustered_grasps', GraspConfigList, self.grasp_config_list_cb)
-        self.x_range = np.arange(0.0, 1, 0.05)
-        self.y_range = np.arange(-0.5, 0.5, 0.05)
-        self.z_range = np.arange(0.5, 0.8, 0.05)
-        self.xyz_ranges = []
-        for z in self.z_range:
-            for y in self.y_range:
-                for x in self.x_range:
-                    self.xyz_ranges.append(Point(x=x, y=y, z=z))
         self.curr_graps_config_list = None
 
     def pcl_cb(self, data: PointCloud2):
@@ -37,8 +29,6 @@ class GraspService:
         
         cloud_samples_msg = CloudSamples()
         cloud_samples_msg.cloud_sources.cloud = pcl_msg
-        for point_msg in self.xyz_ranges:
-            cloud_samples_msg.samples.append(point_msg)
         cloud_samples_msg.cloud_sources.view_points.append(Point(x=0, y=0, z=0))
 
         rospy.loginfo("Publishing cloud")
@@ -48,8 +38,9 @@ class GraspService:
             rospy.sleep(0.5)
             rospy.loginfo("Waiting for gpd grasps")
         
+        
         pose = Pose()
-        pose.position = self.curr_graps_config_list.grasps[0].position # curr_graps_config_list may need to be sorted by score
+        pose.position = self.curr_graps_config_list.grasps[0].position # curr_graps_config_list is already sorted by score
 
         response.best_grasp.pose = pose
 
@@ -61,3 +52,5 @@ if __name__ == '__main__':
     rospy.init_node('gpd_grasp_service')
     GraspService()
     rospy.spin()
+
+

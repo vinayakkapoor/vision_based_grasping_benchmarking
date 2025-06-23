@@ -247,7 +247,7 @@ void GraspDetectionNode::samples_callback(const gpd_ros::SamplesMsg& msg)
 void GraspDetectionNode::initCloudCamera(const gpd_ros::CloudSources& msg)
 {
   // clean up
-  delete cloud_camera_;
+  // delete cloud_camera_;
   cloud_camera_ = NULL;
 
   // Set view points.
