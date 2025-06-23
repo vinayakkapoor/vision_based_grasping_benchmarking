@@ -20,20 +20,22 @@ Make sure you have *docker* installed on your system. Refer to the official dock
 
 Pull the docker image for this project using
 
-    docker pull vinayakapoor/grasping_benchmarking_image:ros1_v0
+    docker pull vinayakapoor/grasping_benchmarking_image:ros1_v1
     
 #### Building your own docker image
 To build your own docker image, clone the repo and use `docker build`
 
     git clone https://github.com/vinayakkapoor/vision_based_grasping_benchmarking.git
     cd vision_based_grasping_benchmarking
-    docker build -t grasping_benchmarking_image:v0 .
+    docker build -t grasping_benchmarking_image:ros1_v2 .
 You might need to add `sudo` depending on how your docker daemon is configured
 
-    sudo docker build -t grasping_benchmarking_image:v0 .
+    sudo docker build -t grasping_benchmarking_image:ros1_v2 .
 </details>
 
 **Without Docker**
+
+PREREQUISITES: ROS Noetic
 
 Clone the repo and run the setup script
 
@@ -86,7 +88,7 @@ grasping_benchmarking
 
   ```sh
   xhost +
-  sudo docker container run --rm -e DISPLAY=$DISPLAY --net host -v /tmp/.X11-unix:/tmp/.X11-unix -it vinayakapoor/grasping_benchmarking_image:v0
+  sudo docker container run --rm -e DISPLAY=$DISPLAY --net host -v /tmp/.X11-unix:/tmp/.X11-unix -it vinayakapoor/grasping_benchmarking_image:ros1_v1
   ```
 
 Then run the container using
@@ -96,15 +98,19 @@ Then run the container using
 
 Run `xhost -` when you're done
 
+Change the grasping algorithm using `vim ./benchmarking_ws/src/benchmarking_vision_based_grasping/benchmarking_grasp/config/configuration.yaml` and changing the _grasp_in_image_frame_ parameter 
+
 </details>
-
-
 
 **Without Docker**
 
     cd ~/grasping_benchmarking                            # Change to the install directory
     ./benchmark_grasping_tmux.sh
     # ./benchmark_grasping_gnome_terminal.sh              # If unfamiliar with tmux navigation
+
+
+![Demo](media/sim_demo.gif)
+
 
 ## Usage
 To better manage the terminals, a tmux script is provided which streamlines debugging and testing. It is recommended to use this script.
@@ -129,7 +135,8 @@ All the rosparams are loaded from `configuration.yaml` file in `grasping_benchma
 
 Change the `grasp_in_image_frame:` to the provided values to switch the algorithm being used to generate grasps on the fly.
 
-**NOTE:** Do NOT forget to change the point_cloud_input:=true in the `benchmark_grasping_tmux.sh` when using **top_surface_algo**. Please use point_cloud_input:=false for the other three algorithms.
+**Note**: The wooden texture described in the paper was created by printing a wooden pattern and applying it to the grasping surface. For reproducibility, we provide the same pattern at `/media/wooden_pattern.jpg` 
+
 
 ## Architecture for grasp generation 
 
@@ -148,6 +155,71 @@ For example, add a folder named "hammer" to the _objects folder_ and put your "h
 2. **Add custom grasping algorithms to benchmark**
 
 A template algorithm is provided in the `grasping_benchmarking_suite/grasp_synthesis`. Implement the predict function in the `service_server.py` for your custom algorithm, and all the ROS part is taken care of by the script!
+
+3. **Add custom gripper to benchmark**
+
+The configurations.yaml file provides several parameters to extend the benchmarking framework to a variety of grippers - 
+
+_gripper_height_: The code removes noisy ground-plane values in the depth image by adjusting depth values based on the gripper height. Specifically, it modifies depths greater than a certain threshold (calculated based on the gripper's height) to ensure the grasping point is sufficiently above the ground plane
+
+_gripper_width_: The width of the gripper is used to adjust the size of the bounding box (rectangular region) around a predicted grasp. This ensures that the grasp region is appropriately scaled to the gripper's dimensions, allowing for more accurate depth and pose calculations.
+
+_gripper_offset_: The gripper_offset is used to adjust the height at which the gripper operates. This ensures that the robot's gripper is at an appropriate height relative to the object being picked or placed.
+
+4. 
+    <details>
+      <summary><b>Running on the real robot</b></summary>
+    To run the benchmarking on the real robot (using ROS1), we would need
+    
+    1.  Rgb / depth images / pointcloud (if running top surface algo) / camera intrinsics being published on appropriate ros topics.
+    
+    
+        a.  To set these ros topics please navigate to the  _configuration.yaml_ file in */benchmarking_vision_based_grasping/benchmarking_grasp/config/*
+    
+        b.  Set these parameters for your camera (they are currently set for realsense)
+
+        > cam_info_depth_align: '/camera/aligned_depth_to_color/camera_info'      # cam_info: '/camera/depth/camera_info'
+        
+        > cam_info_depth: '/camera/depth/camera_info'
+        
+        > point_cloud: "/camera/depth/color/points"
+        
+        > depth_wo_align_image: '/camera/depth/image_rect_raw'
+        
+        > depth_image: '/camera/aligned_depth_to_color/image_raw'
+        
+        > rgb_image: '/camera/color/image_raw'
+      
+        
+        
+        c.  In the benchmark_grasping_tmux.sh (or the benchmarking_grasping_gnome.sh - whichever you're using), set **sim_mode:=false** (instead of true)  
+        
+        
+        > tmux send-keys -t grasping_benchmarking:3 'roslaunch benchmarking_grasp run_benchmark.launch sim_mode:=true' C-m
+    
+    
+    
+        d.  This would launch the realsense camera node and setup static tf transforms appropriately. If you wish to modify this for any other camera, please edit the `/benchmarking_vision_based_grasping/benchmarking_grasp/launch  
+        /run_benchmark.launch` launch file
+    
+    2. Franka panda with moveit
+    
+    
+        a.  Do not run the simulation by commenting out the following 
+        in benchmark_grasping_tmux.sh
+        
+        > tmux send-keys -t grasping_benchmarking:1 'roslaunch panda_simulation
+        > panda_simulation.launch' C-m
+        
+        
+        b.  Instead, run the panda with moveit using
+        
+        
+        c.  `roslaunch panda_moveit_config panda_control_moveit_rviz.launch robot_ip:=<ip> load_gripper:=true`
+        
+        d.  `rosrun moveit_adapter moveit_adapter.py` (in the benchmarking_ws)
+    </details>
+
 
 ## Troubleshooting
 
