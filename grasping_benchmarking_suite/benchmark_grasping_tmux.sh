@@ -46,12 +46,19 @@ tmux send-keys 'cd ./grasp_algo_ws' C-m
 tmux send-keys 'source devel/setup.bash' C-m
 tmux send-keys 'rosrun ros_deep_grasp service_server.py' C-m
 
-# Pane 3: Top Surface Algorithm
+# # Pane 3: Top Surface Algorithm
+# tmux select-pane -t grasping_benchmarking:2.3
+# tmux send-keys 'sleep 15' C-m 'source "./venv/bin/activate"' C-m
+# tmux send-keys 'cd ./grasp_algo_ws' C-m
+# tmux send-keys 'source devel/setup.bash' C-m
+# tmux send-keys 'roslaunch top_surface_algo top_surface.launch' C-m
+
+# Pane 3: GPD Algorithm
 tmux select-pane -t grasping_benchmarking:2.3
 tmux send-keys 'sleep 15' C-m 'source "./venv/bin/activate"' C-m
 tmux send-keys 'cd ./grasp_algo_ws' C-m
 tmux send-keys 'source devel/setup.bash' C-m
-tmux send-keys 'roslaunch top_surface_algo top_surface.launch' C-m
+tmux send-keys 'roslaunch gpd_ros ur5.launch' C-m
 
 # Window 3: Benchmarking
 tmux new-window -t grasping_benchmarking:3 -n 'Benchmarking'

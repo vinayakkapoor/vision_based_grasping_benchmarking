@@ -68,16 +68,13 @@ class BenchmarkTest:
         self.sim_mode = sim_mode
         self.bad_grasp_z = rospy.get_param("bad_grasp_z")
         self.grasp_in_world_frame_topic = rospy.get_param("grasp_in_world_frame") #org
-        # self.grasp_in_world_frame_topic = '/ggcnn_grasp_service/predict'
-        # self.grasp_in_world_frame_topic = '/deep_grasp_service/predict'
-        # self.grasp_in_world_frame_topic = '/debug'
         print("Grasp service topic: ", self.grasp_in_world_frame_topic)
-        # self.grasp_in_world_frame_topic = '/deep_predict'
 
         self.visualisation_topic = rospy.get_param("visualisation")
         self.enable_benchmark_test = rospy.get_param("enable_benchmark_test")
         self.benchmarking_velocity = rospy.get_param("benchmarking_velocity")
         self.robot_default_velocity = rospy.get_param("robot_default_velocity")
+        self.set_approach_pose_topic = rospy.get_param("set_approach_pose")
 
         # Reach scan pose if eye in hand
         if not self.over_head:
@@ -170,6 +167,7 @@ class BenchmarkTest:
             rospy.Subscriber("/gazebo_grasp_plugin_event_republisher/grasp_events", GazeboGraspEvent, self.on_grasp_event)
         rospy.Subscriber("/joint_states", JointState, self.joint_cb)
         rospy.Subscriber(self.visualisation_topic, Image, self.visualization_cb)
+        rospy.Subscriber(self.set_approach_pose_topic, Pose, self.set_approach_pose_cb)
         rospy.Service("/soft_reset", Empty, self.soft_reset)
         rospy.Service("/go_to_home", Empty, self.go_to_home)
         rospy.Timer(rospy.Duration(nsecs=1000000), self.execute_benchmark_test)
@@ -209,16 +207,19 @@ class BenchmarkTest:
         self.testing_in_process = True
         rospy.set_param("start_recording", True)
         
-        try:
-            success = self.process_rgbd_and_execute_pickup()
-            if self.enable_benchmark_test:
-                self.test_benchmark()
-            score = self.benchmark_state
-            if success:
-                self.place()
-        except Exception as e:
-            rospy.logerr("[Benchmarking Pipeline] skipping this turn %s", e)
-            skip = True
+        self.objects_remaining_to_pickup = 1
+        while not self.is_table_clear(): # This functionality is to help extend this pipeline for grasping in cluttered!
+            try:
+                success = self.process_rgbd_and_execute_pickup()
+                if self.enable_benchmark_test:
+                    self.test_benchmark()
+                score = self.benchmark_state
+                if success:
+                    self.place()
+            except Exception as e:
+                rospy.logerr("[Benchmarking Pipeline] skipping this turn %s", e)
+                skip = True
+            self.objects_remaining_to_pickup = 0
 
         self.testing_in_process = False
 
@@ -258,6 +259,17 @@ class BenchmarkTest:
                             rospy.signal_shutdown("[Benchmarking Pipeline] Benchmarking test completed successfully")
         
         rospy.set_param("start_recording", False)
+    
+    def is_table_clear(self, image=None):
+        """
+        Is the table clear
+        """
+        # Implement your logic to check whether the table is clear
+        # Helping function to extend the pipeline for grasping in clutter
+        if self.objects_remaining_to_pickup > 0:
+            return False
+        else: 
+            return True
 
     def soft_reset(self, data):
         """
@@ -329,6 +341,19 @@ class BenchmarkTest:
         output_file_path = os.path.join(output_file_folder, current_recording + ".jpg")
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         cv2.imwrite(output_file_path, img)
+    
+    def set_approach_pose_cb(self, data: Pose):
+        pose_euler = euler_from_quaternion([data.orientation.x,
+                                      data.orientation.y,
+                                      data.orientation.z,
+                                      data.orientation.w])
+        rospy.loginfo(pose_euler)
+        self.pick_and_place.setScanPose(x=data.position.x,
+                                        y=data.position.y,
+                                        z=data.position.z,
+                                        roll=pose_euler[0],
+                                        pitch=pose_euler[1],
+                                        yaw=pose_euler[2])
 
     def parse_benchmarking_yaml(self, yaml_package_path):
         """
